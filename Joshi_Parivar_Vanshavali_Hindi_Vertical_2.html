@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>थोई के जोशी &mdash; वंशावली (Thoii Ke Joshi Family Tree)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Cinzel:wght@500;600;700&family=Amita:wght@400;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root{
+  --parchment:#F6EEDD;
+  --parchment-deep:#EFE2C4;
+  --ink:#3A2317;
+  --maroon:#7A1F2B;
+  --maroon-deep:#591620;
+  --gold:#C9974C;
+  --gold-light:#E7C77E;
+  --gold-deep:#96702F;
+  --indigo:#2B3E5C;
+  --rose:#9C3B52;
+  --bg-outer:#1B0E0A;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;
+  background:var(--bg-outer);
+  font-family:'Poppins',sans-serif;color:var(--ink);
+  -webkit-tap-highlight-color:transparent;}
+
+.frame{
+  position:fixed; inset:8px;
+  border-radius:10px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(201,151,76,0.08) 0%, transparent 70%),
+    var(--parchment);
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(201,151,76,0.12), transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(122,31,43,0.12), transparent 45%),
+    radial-gradient(var(--gold-deep) 0.6px, transparent 0.6px);
+  background-size:auto,auto,18px 18px;
+  box-shadow:0 0 0 2px var(--gold), 0 0 0 8px var(--parchment), 0 0 0 10px var(--maroon), 0 20px 60px rgba(0,0,0,0.55);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+
+/* Rajasthani Background Watermark / Arch Motif */
+.rajasthani-bg-motif {
+  position: absolute;
+  top: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 380px;
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.corner{position:absolute; width:46px; height:46px; z-index:5; pointer-events:none; opacity:0.85;}
+.corner svg{width:100%;height:100%;}
+.corner.tl{top:6px;left:6px;}
+.corner.tr{top:6px;right:6px; transform:scaleX(-1);}
+.corner.bl{bottom:6px;left:6px; transform:scaleY(-1);}
+.corner.br{bottom:6px;right:6px; transform:scale(-1,-1);}
+
+.header{
+  position:relative; text-align:center; padding:12px 60px 10px;
+  background:linear-gradient(to bottom,#FDF7E8,#F1DFB2);
+  border-bottom:2px solid var(--gold-deep);
+  box-shadow:0 2px 10px rgba(0,0,0,0.10);
+  z-index:6; flex-shrink:0;
+}
+.header h1{margin:0; font-family:'Yatra One',cursive; color:var(--maroon); font-size:1.50rem; letter-spacing:0.5px;}
+.header .sub{margin:2px 0 0; font-size:0.72rem; color:#7A5A34; font-family:'Poppins',sans-serif; letter-spacing:0.5px; text-transform:uppercase;}
+.header .divider{width:150px; height:8px; margin:6px auto 0; opacity:0.8;}
+
+#canvas{flex-grow:1; width:100%; height:100%; cursor:grab; position:relative; z-index:2;}
+#canvas:active{cursor:grabbing;}
+svg.main-svg{width:100%; height:100%; display:block;}
+
+.link{fill:none; stroke:var(--gold-deep); stroke-opacity:0.55; stroke-linecap:round;}
+
+.node{cursor:pointer;}
+.node .shape-wrap{transform-box:fill-box; transform-origin:center;}
+.node .pulse-ring{fill:none; stroke:var(--maroon); stroke-width:1.4px; opacity:0; pointer-events:none;}
+.node.has-hidden .pulse-ring{animation:pulseRing 2.1s ease-out infinite;}
+@keyframes pulseRing{
+  0%{opacity:0.55; transform:scale(1);}
+  80%{opacity:0;}
+  100%{opacity:0; transform:scale(2.1);}
+}
+
+.node text.label{
+  paint-order:stroke; stroke:var(--parchment); stroke-width:4px; stroke-linejoin:round;
+}
+.node .label.male{font-family:'Cinzel',serif; font-weight:600; fill:var(--ink);}
+.node .label.female{font-family:'Amita',cursive; font-weight:700; font-style:italic; fill:var(--rose);}
+.node .label.unknown{font-family:'Poppins',sans-serif; font-weight:500; fill:var(--ink);}
+.node .label.root{font-family:'Yatra One',cursive; fill:var(--maroon-deep);}
+
+.node.highlighted .shape-wrap{animation:highlightPulse 1.4s ease-in-out 0s 2;}
+@keyframes highlightPulse{
+  0%{filter:drop-shadow(0 0 0px var(--gold));}
+  50%{filter:drop-shadow(0 0 8px var(--gold)) brightness(1.15);}
+  100%{filter:drop-shadow(0 0 0px var(--gold));}
+}
+
+.watermark{position:absolute; bottom:10px; left:16px; font-size:0.66rem; color:#8C6D53; z-index:6; pointer-events:none; font-family:'Poppins',sans-serif;}
+
+/* Muted Floating Maintenance Box (Top-Left) */
+.maintenance-box{
+  position:absolute; top:48px; left:12px; z-index:18;
+  background:rgba(253,249,238,0.88); border:1px solid var(--gold-deep); border-radius:6px;
+  padding:5px 9px; font-size:0.62rem; box-shadow:0 2px 8px rgba(0,0,0,0.12);
+  max-width:210px; font-family:'Poppins',sans-serif; color:#7A5A34;
+  line-height:1.35; opacity:0.85; transition: opacity 0.2s;
+}
+.maintenance-box:hover{opacity:1;}
+.maintenance-box strong{color:var(--maroon); font-family:'Cinzel',serif; display:block; margin-bottom:1px; font-size:0.66rem;}
+.maintenance-box .contact-num{color:var(--maroon-deep); font-weight:600;}
+
+/* Top-Right Controls (Toolbar + Legend Toggle grouped near legends) */
+.top-controls{
+  position:absolute; top:10px; right:12px; z-index:20;
+  display:flex; gap:5px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
+  max-width:65%;
+}
+.toolbar{display:contents;}
+.btn{
+  background:var(--maroon); color:var(--gold-light); border:1.5px solid var(--gold);
+  padding:6px 10px; border-radius:20px; cursor:pointer; font-family:'Poppins',sans-serif;
+  font-size:0.7rem; font-weight:600; box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  transition:background 0.15s, transform 0.1s; white-space:nowrap;
+}
+.btn:hover{background:var(--maroon-deep); transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn.ghost{background:var(--parchment); color:var(--maroon); border:1.5px solid var(--maroon);}
+
+.search-wrap{position:absolute; top:10px; left:12px; z-index:20; display:flex; gap:6px; align-items:center;}
+.search-wrap input{
+  font-family:'Poppins',sans-serif; font-size:0.76rem; padding:6px 11px; border-radius:20px;
+  border:1.5px solid var(--gold-deep); background:rgba(255,253,249,0.95); color:var(--ink);
+  width:150px; outline:none;
+}
+.search-wrap input:focus{border-color:var(--maroon);}
+.search-wrap .btn{padding:6px 9px;}
+.search-status{position:absolute; top:84px; left:12px; z-index:20; font-size:0.68rem; color:var(--maroon); background:rgba(255,253,249,0.92); padding:3px 9px; border-radius:10px; display:none; font-family:'Poppins',sans-serif;}
+
+.legend{
+  position:absolute; top:46px; right:12px; z-index:20;
+  background:rgba(253,249,238,0.97); border:1.5px solid var(--gold-deep); border-radius:10px;
+  padding:10px 12px; font-size:0.72rem; box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  max-width:190px; display:none; font-family:'Poppins',sans-serif; color:var(--ink);
+}
+.legend.open{display:block;}
+.legend h4{margin:0 0 6px; font-family:'Cinzel',serif; color:var(--maroon); font-size:0.78rem; letter-spacing:0.4px;}
+.legend .row{display:flex; align-items:center; gap:7px; margin:4px 0;}
+.legend svg{flex-shrink:0;}
+.legend .note{margin-top:7px; padding-top:6px; border-top:1px dashed var(--gold-deep); color:#7A5A34; font-size:0.66rem; line-height:1.35;}
+
+.tooltip{
+  position:absolute; background:#FFFDF9; border:1.5px solid var(--gold-deep); padding:6px 12px;
+  border-radius:6px; pointer-events:none; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.18);
+  z-index:100; display:none; font-family:'Amita',cursive; color:var(--maroon); max-width:220px;
+}
+.tooltip .hint{font-size:0.66rem; color:#7A5A34; font-family:'Poppins',sans-serif; display:block; margin-top:2px;}
+
+@media (max-width:640px){
+  .header h1{font-size:1.15rem;}
+  .header{padding:9px 46px 8px;}
+  .search-wrap input{width:105px;}
+  .legend{max-width:150px; font-size:0.66rem; top:44px;}
+  .top-controls{max-width:70%;}
+  .maintenance-box{max-width:160px; font-size:0.58rem; padding:4px 7px;}
+  .btn{font-size:0.62rem; padding:5px 8px;}
+  .corner{width:30px; height:30px;}
+}
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <!-- Rajasthani Jharokha / Mandala SVG Motif Background -->
+  <svg class="rajasthani-bg-motif" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M150 10C78.2 10 20 68.2 20 140C20 211.8 78.2 270 150 270C221.8 270 280 211.8 280 140C280 68.2 221.8 10 150 10ZM150 250C89.3 250 40 200.7 40 140C40 79.3 89.3 30 150 30C210.7 30 260 79.3 260 140C260 200.7 210.7 250 150 250Z" fill="#7A1F2B"/>
+    <path d="M150 50C94.8 50 50 94.8 50 150C50 205.2 94.8 250 150 250C205.2 250 250 205.2 250 150C250 94.8 205.2 50 150 50ZM150 230C105.8 230 70 194.2 70 150C70 105.8 105.8 70 150 70C194.2 70 230 105.8 230 150C230 194.2 194.2 230 150 230Z" fill="#C9974C"/>
+    <path d="M150 80L168 115H208L176 138L188 176L150 153L112 176L124 138L92 115H132L150 80Z" fill="#7A1F2B"/>
+    <circle cx="150" cy="150" r="40" stroke="#C9974C" stroke-width="3" stroke-dasharray="4 4"/>
+  </svg>
+
+  <div class="corner tl"><svg viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg">
+<path d="M2,2 Q2,24 24,24 Q2,24 2,44" fill="none" stroke="#C9974C" stroke-width="1.6"/>
+<path d="M6,2 Q6,20 20,20" fill="none" stroke="#7A1F2B" stroke-width="1.1"/>
+<circle cx="2" cy="2" r="3.4" fill="#7A1F2B" stroke="#C9974C" stroke-width="1"/>
+<circle cx="13" cy="6" r="1.6" fill="#C9974C"/>
+<circle cx="6" cy="13" r="1.6" fill="#C9974C"/>
+</svg></div>
+  <div class="corner tr"><svg viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg">
+<path d="M2,2 Q2,24 24,24 Q2,24 2,44" fill="none" stroke="#C9974C" stroke-width="1.6"/>
+<path d="M6,2 Q6,20 20,20" fill="none" stroke="#7A1F2B" stroke-width="1.1"/>
+<circle cx="2" cy="2" r="3.4" fill="#7A1F2B" stroke="#C9974C" stroke-width="1"/>
+<circle cx="13" cy="6" r="1.6" fill="#C9974C"/>
+<circle cx="6" cy="13" r="1.6" fill="#C9974C"/>
+</svg></div>
+  <div class="corner bl"><svg viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg">
+<path d="M2,2 Q2,24 24,24 Q2,24 2,44" fill="none" stroke="#C9974C" stroke-width="1.6"/>
+<path d="M6,2 Q6,20 20,20" fill="none" stroke="#7A1F2B" stroke-width="1.1"/>
+<circle cx="2" cy="2" r="3.4" fill="#7A1F2B" stroke="#C9974C" stroke-width="1"/>
+<circle cx="13" cy="6" r="1.6" fill="#C9974C"/>
+<circle cx="6" cy="13" r="1.6" fill="#C9974C"/>
+</svg></div>
+  <div class="corner br"><svg viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg">
+<path d="M2,2 Q2,24 24,24 Q2,24 2,44" fill="none" stroke="#C9974C" stroke-width="1.6"/>
+<path d="M6,2 Q6,20 20,20" fill="none" stroke="#7A1F2B" stroke-width="1.1"/>
+<circle cx="2" cy="2" r="3.4" fill="#7A1F2B" stroke="#C9974C" stroke-width="1"/>
+<circle cx="13" cy="6" r="1.6" fill="#C9974C"/>
+<circle cx="6" cy="13" r="1.6" fill="#C9974C"/>
+</svg></div>
+
+  <div class="header">
+    <h1>&#2341;&#2379;&#2312; &#2325;&#2375; &#2332;&#2379;&#2359;&#2368; &mdash; &#2357;&#2306;&#2358;&#2366;&#2357;&#2354;&#2368;</h1>
+    <div class="sub">Thoii Ke Joshi &middot; Interactive Heritage Tree</div>
+    <svg class="divider" viewBox="0 0 150 8"><line x1="0" y1="4" x2="150" y2="4" stroke="#C9974C" stroke-width="1" stroke-dasharray="1,4"/><circle cx="75" cy="4" r="3" fill="#7A1F2B"/><circle cx="60" cy="4" r="1.5" fill="#C9974C"/><circle cx="90" cy="4" r="1.5" fill="#C9974C"/></svg>
+  </div>
+
+  <div id="canvas">
+    <div class="search-wrap">
+      <input id="searchBox" type="text" placeholder="नाम / Name खोजें..." onkeydown="if(event.key==='Enter')doSearch();">
+      <button class="btn" onclick="doSearch()">खोजें</button>
+    </div>
+    <div class="search-status" id="searchStatus"></div>
+
+    <!-- Muted floating maintenance box positioned top-left -->
+    <div class="maintenance-box">
+      <strong>वंशावली प्रबन्ध</strong>
+      रोहित शर्मा (Tata Nagar)<br>
+      संपर्क: <span class="contact-num">+91-9632588051</span>
+    </div>
+
+    <!-- Top-Right Controls (Toolbar + Legend Toggle grouped together) -->
+    <div class="top-controls">
+      <div class="toolbar">
+        <button class="btn ghost" onclick="toggleLayout()" id="layoutToggleBtn">लेआउट</button>
+        <button class="btn ghost" onclick="collapseAll()">समेटें</button>
+        <button class="btn ghost" onclick="expandAll()">खोलें</button>
+        <button class="btn" onclick="resetView()">रीसेट</button>
+      </div>
+      <button class="btn ghost legend-toggle" onclick="toggleLegend()">&#9776; परिचय</button>
+    </div>
+
+    <div class="legend" id="legendPanel">
+      <h4>वंश वृक्ष मार्गदर्शिका</h4>
+      <div class="row"><svg width="20" height="20"><polygon points="10,2 18,10 10,18 2,10" fill="#7A1F2B" stroke="#4a1017" stroke-width="1.5"/></svg><span>पुरुष &mdash; &ldquo;जी&rdquo;</span></div>
+      <div class="row"><svg width="20" height="20"><g transform="translate(10,10)"><ellipse cx="0" cy="-4.5" rx="2.6" ry="4.4" fill="#9C3B52" transform="rotate(0)"/><ellipse cx="0" cy="-4.5" rx="2.6" ry="4.4" fill="#9C3B52" transform="rotate(60)"/><ellipse cx="0" cy="-4.5" rx="2.6" ry="4.4" fill="#9C3B52" transform="rotate(120)"/><ellipse cx="0" cy="-4.5" rx="2.6" ry="4.4" fill="#9C3B52" transform="rotate(180)"/><ellipse cx="0" cy="-4.5" rx="2.6" ry="4.4" fill="#9C3B52" transform="rotate(240)"/><ellipse cx="0" cy="-4.5" rx="2.6" ry="4.4" fill="#9C3B52" transform="rotate(300)"/><circle r="2" fill="#F1DFB2"/></g></svg><span>महिला &mdash; &ldquo;जीजी&rdquo;</span></div>
+      <div class="row"><svg width="20" height="20"><circle cx="10" cy="10" r="7" fill="none" stroke="#7A1F2B" stroke-width="1.5" stroke-dasharray="2,1.5"/></svg><span>शाखा खोलने के लिए टैप करें</span></div>
+      <div class="row"><span style="width:14px;height:14px;border-radius:3px;background:linear-gradient(135deg,#7A1F2B,#1B6B6F,#B8860B);display:inline-block;"></span><span>रंग परिवार की पीढ़ी दर्शाता है</span></div>
+      <div class="note">किसी भी नोड पर टैप करें। हिंदी और अंग्रेजी दोनों नामों से खोजा जा सकता है।</div>
+    </div>
+
+    <div class="watermark">नोड पर टैप करें &middot; पैन करने के लिए खींचें &middot; ज़ूम करें</div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const rawData = {
+  "name": "थोई के जोशी / Thoii Ke Joshi",
+  "children": [
+    {
+      "name": "पुरुषोत्तम जी / Purushottam Ji",
+      "children": [
+        {
+          "name": "रामदास जी / Ramdas Ji",
+          "children": [
+            {
+              "name": "छत्रु राम जी / Chatru Ram Ji",
+              "children": [
+                {
+                  "name": "धर्म राम जी / Dharm Ram Ji",
+                  "children": [
+                    { "name": "त्रिलोक जी / Trilok Ji" },
+                    { "name": "हरसुखराम जी / Harsukhram Ji" },
+                    { "name": "भगतराम जी / Bhagatram Ji" },
+                    { "name": "बाला जी / Bala Ji" },
+                    { "name": "औदाराम जी / Audaram Ji" },
+                    {
+                      "name": "मायाराम जी / Mayaram Ji",
+                      "children": [
+                        {
+                          "name": "रामकिशन जी / Ramkishan Ji",
+                          "children": [
+                            {
+                              "name": "नरसिंहदास जी / Narsinghdas Ji",
+                              "children": [
+                                {
+                                  "name": "सवाई राम जी / Sawai Ram Ji",
+                                  "children": [
+                                    {
+                                      "name": "मंगल लाल जी / Mangal Lal Ji",
+                                      "children": [
+                                        {
+                                          "name": "शिवर्यल जी / Shivaryal Ji",
+                                          "children": [
+                                            { "name": "मामराज गौड़ जी / Mamraj Gaur Ji" }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "name": "रघुनाथ जी / Raghunath Ji",
+                              "children": [
+                                { "name": "राम करण जी / Ram Karan Ji" },
+                                {
+                                  "name": "रामदेव जी / Ramdev Ji",
+                                  "children": [
+                                    { "name": "दुर्गा दत्त जी / Durga Datt Ji" },
+                                    {
+                                      "name": "कल्याण सहाय जी / Kalyan Sahay Ji",
+                                      "children": [
+                                        {
+                                          "name": "मामराज जी / Mamraj Ji",
+                                          "children": [
+                                            {
+                                              "name": "सूर्यदत्त जी / Suryadatt Ji",
+                                              "children": [
+                                                {
+                                                  "name": "पूर्णानंद जी / Purnanand Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "बाल मुकुंद जी / Bal Mukund Ji",
+                                                      "children": [
+                                                        { "name": "अमन जी / Aman Ji" },
+                                                        { "name": "वासु जी / Vasu Ji" }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "यज्ञरत जी / Yagyarat Ji",
+                                                      "children": [
+                                                        { "name": "सुमित जी / Sumit Ji" },
+                                                        { "name": "राम जी / Ram Ji" }
+                                                      ]
+                                                    },
+                                                    { "name": "गणेश जी / Ganesh Ji" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "विश्वनाथ जी / Vishwanath Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "लक्ष्मीकांत जी / Laxmikant Ji",
+                                                      "children": [
+                                                        { "name": "रवि जी / Ravi Ji" },
+                                                        { "name": "राहुल जी / Rahul Ji" }
+                                                      ]
+                                                    },
+                                                    { "name": "सोमदत्त जी / Somdatt Ji" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "जनार्दन जी / Janardan Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "देव दत्त जी / Dev Datt Ji",
+                                                      "children": [
+                                                        { "name": "मयंक जी / Mayank Ji" }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "कृष्ण दत्त जी / Krishan Datt Ji",
+                                                      "children": [
+                                                        { "name": "श्याम जी / Shyam Ji" }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "name": "सतीश चंद्र जी / Satish Chandra Ji",
+                                              "children": [
+                                                {
+                                                  "name": "सुभाष जी / Subhash Ji",
+                                                  "children": [
+                                                    { "name": "उमाशंकर जी / Umashankar Ji" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "जयराम जी / Jayram Ji",
+                                                  "children": [
+                                                    { "name": "भानु प्रताप जी / Bhanu Pratap Ji" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "देवव्रत जी / Devvrat Ji",
+                                                  "children": [
+                                                    { "name": "हिमांशु जी / Himanshu Ji" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "प्रियव्रत जी / Priyavrat Ji",
+                                                  "children": [
+                                                    { "name": "यश जी / Yash Ji" }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "name": "गणेशदत्त जी / Ganeshdatta Ji",
+                              "children": [
+                                {
+                                  "name": "रामदत्त जी / Ramdatta Ji",
+                                  "children": [
+                                    {
+                                      "name": "लक्ष्मणदास जी / Lakshmandas Ji",
+                                      "children": [
+                                        {
+                                          "name": "घनश्यामदास जी / Ghanshyamdas Ji",
+                                          "children": [
+                                            {
+                                              "name": "चौथमल जी / Chauthmal Ji",
+                                              "children": [
+                                                {
+                                                  "name": "गोपीकृष्ण जी / Gopikrishan Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "प्रहलाद जी / Prahlad Ji",
+                                                      "children": [
+                                                        {
+                                                          "name": "शैलेंद्र जी / Shailendra Ji",
+                                                          "children": [
+                                                            { "name": "मुदित जी / Mudit Ji" },
+                                                            { "name": "योजित जी / Yojit Ji" }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "name": "दीपक जी / Deepak Ji",
+                                                          "children": [
+                                                            { "name": "षष्ठी जी / Shashthi Ji" },
+                                                            { "name": "उमा जीजी / Uma Gigi" }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "ओम प्रकाश जी / Om Prakash Ji",
+                                                      "children": [
+                                                        {
+                                                          "name": "रोहित जी / Rohit Ji",
+                                                          "children": [
+                                                            { "name": "तान्या जीजी / Tanya Gigi" },
+                                                            { "name": "कृतिका जीजी / Kritika Gigi" }
+                                                          ]
+                                                        },
+                                                        { "name": "गौरव जी / Gaurav Ji" }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "महेश जी / Mahesh Ji",
+                                                      "children": [
+                                                        {
+                                                          "name": "अमित जी / Amit Ji",
+                                                          "children": [
+                                                            { "name": "ऐश्वर्या जीजी / Aishwarya Gigi" },
+                                                            { "name": "पूर्वा जीजी / Purva Gigi" }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "name": "सुमित जी / Sumit Ji",
+                                                          "children": [
+                                                            { "name": "रौनाक जी / Raunak Ji" },
+                                                            { "name": "प्रियांशी जीजी / Priyanshi Gigi" }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "शिवशंकर जी / Shivshankar Ji",
+                                                      "children": [
+                                                        { "name": "चांदनी जीजी / Chandani Gigi" }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "गिरधारी जी / Girdhari Ji",
+                                                      "children": [
+                                                        { "name": "आयुष जी / Ayush Ji" },
+                                                        { "name": "खुशबू जीजी / Khushboo Gigi" }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "हेमंत जी / Hemant Ji",
+                                                      "children": [
+                                                        { "name": "अनुराग जी / Anurag Ji" },
+                                                        { "name": "हिमांशु जी / Himanshu Ji" }
+                                                      ]
+                                                    },
+                                                    { "name": "पूर्णिमा जीजी / Purnima Gigi" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "दुर्गाप्रसाद जी / Durgaprasad Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "महिंद्र प्रताप जी / Mahindra Pratap Ji",
+                                                      "children": [
+                                                        { "name": "द्विगम् जी / Dvigam Ji" },
+                                                        { "name": "तनु जीजी / Tanu Gigi" }
+                                                      ]
+                                                    },
+                                                    { "name": "कौशल्या जीजी / Kaushalya Gigi" },
+                                                    { "name": "चंचल जीजी / Chanchal Gigi" },
+                                                    { "name": "विजया जीजी / Vijaya Gigi" },
+                                                    { "name": "रेखा जीजी / Rekha Gigi" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "बनवारी दत्त जी / Banwari Datt Ji",
+                                                  "children": [
+                                                    { "name": "नलिनी जीजी / Nalini Gigi" },
+                                                    { "name": "लता जीजी / Lata Gigi" },
+                                                    {
+                                                      "name": "ललित जी / Lalit Ji",
+                                                      "children": [
+                                                        { "name": "विवेक जी / Vivek Ji" },
+                                                        { "name": "सेजल जीजी / Sejal Gigi" }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "name": "हजारीलाल जी / Hazarilal Ji",
+                                              "children": [
+                                                {
+                                                  "name": "मन्नालाल जी / Mannalal Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "भंवरलाल जी / Bhanwarlal Ji",
+                                                      "children": [
+                                                        {
+                                                          "name": "मिट्ठूलाल जी / Mitthulal Ji",
+                                                          "children": [
+                                                            {
+                                                              "name": "संजीव जी / Sanjeev Ji",
+                                                              "children": [
+                                                                { "name": "खुश जी / Khush Ji" },
+                                                                { "name": "शैलजा जीजी / Shailja Gigi" }
+                                                            ]
+                                                            },
+                                                            { "name": "देवेंद्र जी / Devendra Ji" },
+                                                            { "name": "ऋतु / Ritu" }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "name": "राजेंद्र जी / Rajendra Ji",
+                                                          "children": [
+                                                            {
+                                                              "name": "अमित जी / Amit Ji",
+                                                              "children": [
+                                                                { "name": "आदित्य जी / Aditya Ji" },
+                                                                { "name": "सोमिला जीजी / Somila Gigi" }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "name": "रवि जी / Ravi Ji",
+                                                              "children": [
+                                                                { "name": "रुद्राक्षी जीजी / Rudrakshi Gigi" }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "name": "सुधीर जी / Sudhir Ji",
+                                                          "children": [
+                                                            { "name": "सुरभि जीजी / Surbhi Gigi" },
+                                                            { "name": "अभिनव जी / Abhinav Ji" }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "कैलाश जी / Kailash Ji",
+                                                      "children": [
+                                                        { "name": "मनीष जी / Manish Ji" },
+                                                        { "name": "शिव जी / Shiv Ji" },
+                                                        { "name": "कलावती जीजी / Kalawati Gigi" }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "रामपाल जी / Rampal Ji",
+                                                      "children": [
+                                                        {
+                                                          "name": "संदीप जी / Sandeep Ji",
+                                                          "children": [
+                                                            { "name": "त्वरित जी / Tvarit Ji" }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "name": "प्रदीप जी / Pradeep Ji",
+                                                          "children": [
+                                                            { "name": "पार्थ जी / Parth Ji" }
+                                                          ]
+                                                        },
+                                                        { "name": "मनीषा जीजी / Manisha Gigi" }
+                                                      ]
+                                                    },
+                                                    { "name": "प्रमिला जीजी / Pramila Gigi" },
+                                                    { "name": "मधु जीजी / Madhu Gigi" },
+                                                    { "name": "अन्नू जीजी / Annu Gigi" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "मथुरा प्रसाद जी / Mathura Prasad Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "श्याम सुंदर जी / Shyam Sundar Ji",
+                                                      "children": [
+                                                        { "name": "सौरभ जी / Saurabh Ji" }
+                                                      ]
+                                                    },
+                                                    { "name": "विमला देवी जीजी / Vimla Devi Gigi" },
+                                                    { "name": "शारदा देवी जीजी / Sharda Devi Gigi" },
+                                                    { "name": "गायत्री देवी जीजी / Gayatri Devi Gigi" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "सूरजमल जी / Surajmal Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "अशोक जी / Ashok Ji",
+                                                      "children": [
+                                                        { "name": "पुर्व / Purv" },
+                                                        { "name": "माधुरी जीजी / Madhuri Gigi" }
+                                                      ]
+                                                    },
+                                                    { "name": "पुष्पा देवी जीजी / Pushpa Devi Gigi" },
+                                                    { "name": "श्यामा देवी जीजी / Shyama Devi Gigi" },
+                                                    { "name": "सावित्री देवी जीजी / Savitri Devi Gigi" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "बद्री प्रसाद जी / Badri Prasad Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "पवन जी / Pawan Ji",
+                                                      "children": [
+                                                        { "name": "दीपक जी / Deepak Ji" },
+                                                        { "name": "राहुल जी / Rahul Ji" },
+                                                        { "name": "ज्योति जीजी / Jyoti Gigi" }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "name": "विजय जी / Vijay Ji",
+                                                      "children": [
+                                                        { "name": "रोहित जी / Rohit Ji" },
+                                                        { "name": "अंकित जी / Ankit Ji" }
+                                                      ]
+                                                    },
+                                                    { "name": "पुरुषोत्तम जी / Purushottam Ji" },
+                                                    { "name": "सत्यभामा जीजी / Satyabhama Gigi" },
+                                                    { "name": "कुसुम जीजी / Kusum Gigi" },
+                                                    { "name": "अन्नपूर्णा जीजी / Annapurna Gigi" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "गणपतचंद्र जी / Ganpatchandra Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "मनोज जी / Manoj Ji",
+                                                      "children": [
+                                                        { "name": "जलज जी / Jalaj Ji" },
+                                                        { "name": "गौरव जी / Gaurav Ji" }
+                                                      ]
+                                                    },
+                                                    { "name": "सुधा देवी जीजी / Sudha Devi Gigi" }
+                                                  ]
+                                                },
+                                                {
+                                                  "name": "ईश्वर चंद जी / Ishwar Chand Ji",
+                                                  "children": [
+                                                    {
+                                                      "name": "सीताराम जी / Sitaram Ji",
+                                                      "children": [
+                                                        { "name": "आलोक जी / Alok Ji" },
+                                                        { "name": "ऋतु जीजी / Ritu Gigi" },
+                                                        { "name": "रचना जीजी / Rachna Gigi" },
+                                                        { "name": "अमृता जीजी / Amrita Gigi" }
+                                                      ]
+                                                    },
+                                                    { "name": "रमेश जी / Ramesh Ji" },
+                                                    { "name": "कमला देवी जीजी / Kamala Devi Gigi" },
+                                                    { "name": "प्रेमलता देवी जीजी / Premlata Devi Gigi" }
+                                                  ]
+                                                },
+                                                { "name": "सरस्वती जीजी / Saraswati Gigi" },
+                                                { "name": "शांति जीजी / Shanti Gigi" }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    { "name": "जवाहरलाल जी / Jawaharlal Ji" }
+                                  ]
+                                },
+                                { "name": "श्रीराम जी / Shriram Ji" },
+                                { "name": "बलदेव जी / Baldev Ji" }
+                              ]
+                            }
+                          ]
+                        },
+                        { "name": "सवाईराम जी / Sawairam Ji" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+/* ---------------- gender detection ---------------- */
+function getGender(name, isRoot){
+  if(isRoot) return 'root';
+  const cleanName = (name||'').split('/')[0].trim();
+  const engPart = (name||'').split('/')[1] ? (name||'').split('/')[1].trim().toLowerCase() : '';
+  if(cleanName.endsWith('जीजी') || engPart.includes('gigi')) return 'female';
+  if(cleanName.endsWith('जी') || engPart === 'purv' || cleanName === 'पुर्व' || cleanName === 'पूर्व') return 'male';
+  const tokens = cleanName.split(/\s+/);
+  const last = (tokens[tokens.length-1]||'');
+  if(last === 'जीजी') return 'female';
+  if(last === 'जी') return 'male';
+  return 'unknown';
+}
+
+/* ---------------- colour helpers ---------------- */
+const LINEAGE_PALETTE = [
+  '#7A1F2B','#1B6B6F','#B8860B','#3B3486','#1F6F4F','#B5502D',
+  '#6B2C5F','#1F4E79','#C2703D','#2E5339','#9C3B52','#5C4A8C'
+];
+const TRUNK_COLOR = '#8C6D3E';
+
+function hexToRgb(hex){
+  const h = hex.replace('#','');
+  return { r: parseInt(h.substring(0,2),16), g: parseInt(h.substring(2,4),16), b: parseInt(h.substring(4,6),16) };
+}
+function lighten(hex, amt){
+  const {r,g,b} = hexToRgb(hex);
+  const nr = Math.round(r + (255-r)*amt);
+  const ng = Math.round(g + (255-g)*amt);
+  const nb = Math.round(b + (255-b)*amt);
+  return `rgb(${nr},${ng},${nb})`;
+}
+function darken(hex, amt){
+  const {r,g,b} = hexToRgb(hex);
+  const nr = Math.round(r*(1-amt));
+  const ng = Math.round(g*(1-amt));
+  const nb = Math.round(b*(1-amt));
+  return `rgb(${nr},${ng},${nb})`;
+}
+
+let colorCounter = 0;
+function assignLineageColor(node, inheritedColor){
+  let color = inheritedColor;
+  if(node.parent && node.parent.children && node.parent.children.length > 1){
+    color = LINEAGE_PALETTE[colorCounter % LINEAGE_PALETTE.length];
+    colorCounter++;
+  }
+  node.lineageColor = color;
+  if(node.children) node.children.forEach(c => assignLineageColor(c, color));
+}
+
+/* ---------------- shape builders ---------------- */
+function sunPoints(rOuter, rInner, spikes){
+  let pts = [];
+  for(let i=0;i<spikes*2;i++){
+    const r = i%2===0 ? rOuter : rInner;
+    const angle = (Math.PI*i)/spikes - Math.PI/2;
+    pts.push((r*Math.cos(angle)).toFixed(2)+','+(r*Math.sin(angle)).toFixed(2));
+  }
+  return pts.join(' ');
+}
+function diamondPoints(r){
+  return `0,${-r} ${r},0 0,${r} ${-r},0`;
+}
+function appendFlower(sel, r){
+  const petals = 6;
+  for(let k=0;k<petals;k++){
+    sel.append('ellipse')
+      .attr('cx',0).attr('cy', -r*0.62)
+      .attr('rx', r*0.34).attr('ry', r*0.6)
+      .attr('transform', `rotate(${k*(360/petals)})`)
+      .attr('class','petal');
+  }
+  sel.append('circle').attr('r', r*0.34).attr('class','flower-center');
+}
+
+/* ---------------- build hierarchy & responsive layout setup ---------------- */
+const container = document.getElementById('canvas');
+const width = container.clientWidth || window.innerWidth;
+const height = container.clientHeight || window.innerHeight;
+
+// Auto-configure layout based on screen width: vertical for mobile (<768px), horizontal for desktops
+let isVertical = width < 768;
+
+let i = 0;
+const duration = 420;
+let root = d3.hierarchy(rawData, d => d.children);
+
+let idCounter = 0;
+root.each(d => {
+  d.id = ++idCounter;
+  d.gender = getGender(d.data.name, d.depth === 0);
+});
+assignLineageColor(root, TRUNK_COLOR);
+
+const searchIndex = root.descendants();
+
+root.x0 = height / 2;
+root.y0 = 40;
+
+function collapse(d){
+  if(d.children){
+    d._children = d.children;
+    d._children.forEach(collapse);
+    d.children = null;
+  }
+}
+function initialCollapse(d){
+  if(!d.children) return;
+  if(d.children.length === 1){
+    initialCollapse(d.children[0]);
+  } else {
+    d.children.forEach(child => collapse(child));
+  }
+}
+initialCollapse(root);
+
+const zoom = d3.zoom()
+  .scaleExtent([0.04, 4])
+  .on('zoom', (event) => { g.attr('transform', event.transform); });
+
+const svg = d3.select('#canvas').append('svg')
+  .attr('class','main-svg')
+  .call(zoom);
+
+const g = svg.append('g');
+
+update(root);
+applyInitialTransform();
+
+function applyInitialTransform(){
+  if(isVertical){
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width/2, 60).scale(0.65));
+  } else {
+    svg.call(zoom.transform, d3.zoomIdentity.translate(70, height/2).scale(0.72));
+  }
+}
+
+function update(source){
+  const breadthSpacing = isVertical ? 150 : 38;
+  const depthSpacing = isVertical ? 110 : 225;
+  const treeLayout = d3.tree().nodeSize([breadthSpacing, depthSpacing]);
+
+  const treeData = treeLayout(root);
+  const nodes = treeData.descendants();
+  const links = treeData.links();
+
+  nodes.forEach(d => {
+    if(isVertical){
+      d.y = d.depth * 110;
+    } else {
+      d.y = d.depth * 225;
+    }
+  });
+
+  /* ---- links ---- */
+  const link = g.selectAll('path.link').data(links, d => d.target.id);
+
+  const linkEnter = link.enter().insert('path','g')
+    .attr('class','link')
+    .attr('stroke', d => d.target.lineageColor)
+    .attr('stroke-width', d => Math.max(1, 3.2 - d.target.depth*0.18))
+    .attr('d', () => {
+      const o = isVertical ? {x: source.x0, y: source.y0} : {x: source.x0, y: source.y0};
+      return diagonal(o, o, isVertical);
+    });
+
+  const linkUpdate = linkEnter.merge(link);
+  linkUpdate.transition().duration(duration)
+    .attr('stroke', d => d.target.lineageColor)
+    .attr('d', d => diagonal(d.source, d.target, isVertical));
+
+  link.exit().transition().duration(duration)
+    .attr('d', () => {
+      const o = {x: source.x, y: source.y};
+      return diagonal(o, o, isVertical);
+    })
+    .remove();
+
+  /* ---- nodes ---- */
+  const node = g.selectAll('g.node').data(nodes, d => d.id);
+
+  const nodeEnter = node.enter().append('g')
+    .attr('class', d => 'node gender-' + d.gender)
+    .attr('transform', () => {
+      return isVertical ? `translate(${source.x0},${source.y0})` : `translate(${source.y0},${source.x0})`;
+    })
+    .on('click', (event, d) => {
+      if(d.children){ d._children = d.children; d.children = null; }
+      else if(d._children){ d.children = d._children; d._children = null; }
+      update(d);
+    })
+    .on('mouseover', (event, d) => {
+      const tt = document.getElementById('tooltip');
+      tt.style.display = 'block';
+      const state = d.children ? 'शाखा समेटने के लिए क्लिक करें' : (d._children ? 'शाखा खोलने के लिए क्लिक करें' : 'परिवार के सदस्य');
+      tt.innerHTML = `<strong>${d.data.name}</strong><span class="hint">${state}</span>`;
+      tt.style.left = (event.pageX + 16) + 'px';
+      tt.style.top = (event.pageY - 12) + 'px';
+    })
+    .on('mousemove', (event) => {
+      const tt = document.getElementById('tooltip');
+      tt.style.left = (event.pageX + 16) + 'px';
+      tt.style.top = (event.pageY - 12) + 'px';
+    })
+    .on('mouseout', () => { document.getElementById('tooltip').style.display = 'none'; });
+
+  nodeEnter.append('circle').attr('class','pulse-ring').attr('r', 12);
+
+  const shapeWrap = nodeEnter.append('g').attr('class','shape-wrap').attr('transform','scale(0.001)');
+
+  shapeWrap.each(function(d){
+    const sel = d3.select(this);
+    if(d.gender === 'root'){
+      sel.append('polygon').attr('class','shape-main').attr('points', sunPoints(24,16,12));
+      sel.append('circle').attr('r', 9).attr('class','shape-core');
+    } else if(d.gender === 'male'){
+      sel.append('polygon').attr('class','shape-main').attr('points', diamondPoints(9));
+    } else if(d.gender === 'female'){
+      appendFlower(sel, 10);
+    } else {
+      sel.append('circle').attr('class','shape-main').attr('r', 7.5).attr('stroke-dasharray','2,2');
+    }
+  });
+
+  const textSel = nodeEnter.append('text')
+    .attr('class', d => 'label ' + d.gender)
+    .attr('dy', d => isVertical ? '1.6em' : '0.25em')
+    .attr('x', d => {
+      if(isVertical) return 0;
+      return (d.children || d._children) ? -18 : 18;
+    })
+    .attr('text-anchor', d => {
+      if(isVertical) return 'middle';
+      return (d.children || d._children) ? 'end' : 'start';
+    })
+    .style('fill-opacity', 1e-6);
+
+  textSel.append('tspan')
+    .attr('x', d => isVertical ? 0 : ((d.children || d._children) ? -18 : 18))
+    .attr('font-size', '11.5px')
+    .attr('text-anchor', d => isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start'))
+    .text(d => {
+      const parts = d.data.name.split('/');
+      return parts[0] ? parts[0].trim() : d.data.name;
+    });
+
+  textSel.append('tspan')
+    .attr('x', d => isVertical ? 0 : ((d.children || d._children) ? -18 : 18))
+    .attr('dy', '1.1em')
+    .attr('font-size', '9px')
+    .attr('fill-opacity', '0.75')
+    .attr('font-family', 'Poppins, sans-serif')
+    .attr('text-anchor', d => isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start'))
+    .text(d => {
+      const parts = d.data.name.split('/');
+      return parts[1] ? parts[1].trim() : '';
+    });
+
+  const nodeUpdate = node.merge(nodeEnter);
+
+  nodeUpdate.attr('class', d => {
+    let c = 'node gender-' + d.gender;
+    if(d._children) c += ' has-hidden';
+    return c;
+  });
+
+  nodeUpdate.transition().duration(duration)
+    .attr('transform', d => isVertical ? `translate(${d.x},${d.y})` : `translate(${d.y},${d.x})`);
+
+  nodeUpdate.select('.shape-wrap').transition().duration(duration)
+    .attr('transform', d => {
+      let scale = 1;
+      if(d.gender === 'root') scale = 1;
+      else if(!d.children && !d._children) scale = 0.85;
+      else if(d._children) scale = 1.05;
+      return `scale(${scale})`;
+    });
+
+  nodeUpdate.each(function(d){
+    const sel = d3.select(this);
+    const color = d.lineageColor;
+    const isLeaf = !d.children && !d._children;
+    const isOpenInternal = !!d.children;
+    const isCollapsed = !!d._children;
+    let fill, stroke;
+    if(d.gender === 'root'){
+      fill = 'var(--gold)'; stroke = 'var(--maroon-deep)';
+      sel.select('.shape-core').attr('fill', 'var(--maroon)');
+    } else if(isLeaf){
+      fill = '#FFFDF9'; stroke = color;
+    } else if(isOpenInternal){
+      fill = color; stroke = darken(color, 0.35);
+    } else if(isCollapsed){
+      fill = lighten(color, 0.55); stroke = color;
+    }
+    if(d.gender === 'female'){
+      sel.selectAll('.petal').attr('fill', fill).attr('stroke', stroke).attr('stroke-width', 1.1);
+      sel.select('.flower-center').attr('fill', stroke).attr('stroke','none');
+    } else {
+      sel.select('.shape-main').attr('fill', fill).attr('stroke', stroke).attr('stroke-width', 1.8);
+    }
+    sel.select('.pulse-ring').attr('stroke', color);
+  });
+
+  nodeUpdate.select('text.label').style('fill-opacity', 1);
+
+  const nodeExit = node.exit().transition().duration(duration)
+    .attr('transform', () => {
+      return isVertical ? `translate(${source.x},${source.y})` : `translate(${source.y},${source.x})`;
+    })
+    .remove();
+  nodeExit.select('.shape-wrap').attr('transform','scale(0.001)');
+  nodeExit.select('text').style('fill-opacity', 1e-6);
+
+  nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+
+  const btnText = isVertical ? 'क्षैतिज (Horizontal)' : 'लंबवत (Vertical)';
+  document.getElementById('layoutToggleBtn').textContent = btnText;
+}
+
+function diagonal(s, t, vertical){
+  if(vertical){
+    return `M ${s.x} ${s.y} C ${s.x} ${(s.y+t.y)/2}, ${t.x} ${(s.y+t.y)/2}, ${t.x} ${t.y}`;
+  }
+  return `M ${s.y} ${s.x} C ${(s.y+t.y)/2} ${s.x}, ${(s.y+t.y)/2} ${t.x}, ${t.y} ${t.x}`;
+}
+
+function toggleLayout(){
+  isVertical = !isVertical;
+  update(root);
+  applyInitialTransform();
+}
+
+function resetView(){
+  applyInitialTransform();
+}
+
+function expandAll(){
+  function ex(d){
+    if(d._children){ d.children = d._children; d._children = null; }
+    if(d.children) d.children.forEach(ex);
+  }
+  ex(root);
+  update(root);
+}
+
+function collapseAll(){
+  if(root.children) root.children.forEach(collapse);
+  update(root);
+  resetView();
+}
+
+function toggleLegend(){
+  document.getElementById('legendPanel').classList.toggle('open');
+}
+
+function doSearch(){
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  const statusEl = document.getElementById('searchStatus');
+  if(!q){ statusEl.style.display='none'; return; }
+  const match = searchIndex.find(d => d.data.name.toLowerCase().includes(q));
+  if(!match){
+    statusEl.textContent = 'कोई परिणाम नहीं मिला / No match for "' + q + '"';
+    statusEl.style.display = 'block';
+    setTimeout(() => statusEl.style.display='none', 2500);
+    return;
+  }
+  statusEl.style.display = 'none';
+  let anc = match.parent;
+  while(anc){
+    if(anc._children){ anc.children = anc._children; anc._children = null; }
+    anc = anc.parent;
+  }
+  update(root);
+  setTimeout(() => {
+    const scale = 1;
+    const tx = isVertical ? (width/2 - match.x*scale) : (width/2 - match.y*scale);
+    const ty = isVertical ? (height/2 - match.y*scale) : (height/2 - match.x*scale);
+    svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+    setTimeout(() => {
+      g.selectAll('g.node').each(function(d){
+        if(d.id === match.id){
+          d3.select(this).classed('highlighted', true);
+          setTimeout(() => d3.select(this).classed('highlighted', false), 3000);
+        }
+      });
+    }, 750);
+  }, 60);
+}
+</script>
+
+</body>
+</html>
