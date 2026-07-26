@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Cinzel:wght@500;600;700&family=Amita:wght@400;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-<link rel="stylesheet" href="styles.css">
 <style>
 :root{
   --parchment:#F6EEDD;
@@ -173,14 +172,6 @@ svg.main-svg{width:100%; height:100%; display:block;}
 .legend svg{flex-shrink:0;}
 .legend .note{margin-top:7px; padding-top:6px; border-top:1px dashed var(--gold-deep); color:#7A5A34; font-size:0.66rem; line-height:1.35;}
 
-.tooltip{
-  position:absolute; background:#FFFDF9; border:1.5px solid var(--gold-deep); padding:6px 12px;
-  border-radius:6px; pointer-events:auto; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.18);
-  z-index:100; display:none; font-family:'Amita',cursive; color:var(--maroon); max-width:220px;
-  cursor: pointer;
-}
-.tooltip .hint{font-size:0.66rem; color:#7A5A34; font-family:'Poppins',sans-serif; display:block; margin-top:2px;}
-
 @media (max-width:640px){
   .header h1{font-size:1.15rem;}
   .header{padding:8px 46px 10px;}
@@ -304,8 +295,6 @@ svg.main-svg{width:100%; height:100%; display:block;}
     <div class="watermark">नोड पर टैप करें &middot; पैन करने के लिए खींचें &middot; ज़ूम करें</div>
   </div>
 </div>
-
-<div class="tooltip" id="tooltip" onclick="toggleTooltipPin(event)"></div>
 
 <script>
 const rawData = {
@@ -917,54 +906,6 @@ function applyInitialTransform(){
   }
 }
 
-/* ---------------- Tooltip Timer & Pin State Logic ---------------- */
-let tooltipTimeout = null;
-let isTooltipPinned = false;
-
-function showTooltip(htmlContent, pageX, pageY, isPinned = false) {
-  const tt = document.getElementById('tooltip');
-  if (tooltipTimeout) {
-    clearTimeout(tooltipTimeout);
-    tooltipTimeout = null;
-  }
-  tt.innerHTML = htmlContent;
-  tt.style.display = 'block';
-  tt.style.left = (pageX + 16) + 'px';
-  tt.style.top = (pageY - 12) + 'px';
-
-  if (isPinned) {
-    isTooltipPinned = true;
-    return;
-  }
-
-  isTooltipPinned = false;
-  tooltipTimeout = setTimeout(() => {
-    if (!isTooltipPinned) {
-      tt.style.display = 'none';
-    }
-  }, 3000);
-}
-
-function toggleTooltipPin(event) {
-  event.stopPropagation();
-  const tt = document.getElementById('tooltip');
-  isTooltipPinned = !isTooltipPinned;
-  if (!isTooltipPinned) {
-    tt.style.display = 'none';
-  }
-}
-
-function hideTooltip() {
-  if (!isTooltipPinned) {
-    const tt = document.getElementById('tooltip');
-    if (tooltipTimeout) {
-      clearTimeout(tooltipTimeout);
-      tooltipTimeout = null;
-    }
-    tt.style.display = 'none';
-  }
-}
-
 function update(source){
   const breadthSpacing = isVertical ? 150 : 38;
   const depthSpacing = isVertical ? 110 : 225;
@@ -1016,35 +957,9 @@ function update(source){
     })
     .on('click', (event, d) => {
       event.stopPropagation();
-      const state = d.children ? 'शाखा समेटने के लिए क्लिक करें' : (d._children ? 'शाखा खोलने के लिए क्लिक करें' : 'परिवार के सदस्य');
-      const htmlContent = `<strong>${d.data.name}</strong><span class="hint">${state} (टैप करके बंद करें)</span>`;
-      
-      const tt = document.getElementById('tooltip');
-      if (tt.style.display === 'block' && isTooltipPinned) {
-        // If already pinned, second tap dismisses it
-        isTooltipPinned = false;
-        tt.style.display = 'none';
-      } else {
-        showTooltip(htmlContent, event.pageX, event.pageY, true);
-      }
-
       if(d.children){ d._children = d.children; d.children = null; }
       else if(d._children){ d.children = d._children; d._children = null; }
       update(d);
-    })
-    .on('mouseover', (event, d) => {
-      if(isTooltipPinned) return;
-      const state = d.children ? 'शाखा समेटने के लिए क्लिक करें' : (d._children ? 'शाखा खोलने के लिए क्लिक करें' : 'परिवार के सदस्य');
-      showTooltip(`<strong>${d.data.name}</strong><span class="hint">${state}</span>`, event.pageX, event.pageY, false);
-    })
-    .on('mousemove', (event) => {
-      if(isTooltipPinned) return;
-      const tt = document.getElementById('tooltip');
-      tt.style.left = (event.pageX + 16) + 'px';
-      tt.style.top = (event.pageY - 12) + 'px';
-    })
-    .on('mouseout', () => {
-      hideTooltip();
     });
 
   nodeEnter.append('circle').attr('class','pulse-ring').attr('r', 12);
@@ -1228,72 +1143,6 @@ function doSearch(){
   }, 60);
 }
 </script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Check if the device is a touch/mobile screen using pointer queries
-    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
-      
-      // Select your interactive elements (update '.interactive-card' to match your class name)
-      const interactiveItems = document.querySelectorAll('.interactive-card');
 
-      interactiveItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-          const isActive = item.classList.contains('is-active');
-          
-          // Optional: Close all other open tooltips/cards first
-          interactiveItems.forEach(el => el.classList.remove('is-active'));
-          
-          // Toggle the clicked item
-          if (!isActive) {
-            item.classList.add('is-active');
-          }
-          
-          // Stop the click from immediately triggering the document listener below
-          e.stopPropagation();
-        });
-      });
-
-      // Dismiss active states when tapping anywhere else on the page
-      document.addEventListener('click', () => {
-        interactiveItems.forEach(item => {
-          item.classList.remove('is-active');
-        });
-      });
-    }
-  });
-</script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
-        const familyNodes = document.querySelectorAll('.family-node');
-
-        familyNodes.forEach(node => {
-          node.addEventListener('click', (e) => {
-            const isActive = node.classList.contains('is-active');
-            familyNodes.forEach(n => n.classList.remove('is-active'));
-
-            if (!isActive) {
-              node.classList.add('is-active');
-              setTimeout(() => {
-                node.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'center',
-                  inline: 'center'
-                });
-              }, 200);
-            }
-            e.stopPropagation();
-          });
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!e.target.closest('.family-node')) {
-            familyNodes.forEach(node => node.classList.remove('is-active'));
-          }
-        });
-      }
-    });
-  </script>
 </body>
 </html>
