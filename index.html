@@ -26,7 +26,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;
   font-family:'Poppins',sans-serif;color:var(--ink);
   -webkit-tap-highlight-color:transparent;}
 
-/* Using CSS Grid instead of Flexbox to prevent mobile height collapse bugs */
 .frame{
   position:fixed; inset:8px;
   border-radius:10px;
@@ -80,7 +79,8 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;
 #canvas{
   grid-row: 2;
   width:100%; height:100%; cursor:grab; position:relative; z-index:2;
-  touch-action: none; /* Crucial for smooth mobile panning/pinching */
+  min-height: 0; min-width: 0; /* Crucial fix to prevent grid container collapse on desktop/mobile */
+  touch-action: none;
 }
 #canvas:active{cursor:grabbing;}
 svg.main-svg{width:100%; height:100%; display:block;}
@@ -169,7 +169,7 @@ svg.main-svg{width:100%; height:100%; display:block;}
 .legend svg{flex-shrink:0;}
 .legend .note{margin-top:8px; paddingTop:7px; border-top:1px dashed var(--gold-deep); color:#7A5A34; font-size:0.65rem; line-height:1.35;}
 
-/* ---- Responsive Drawer / Bottom Sheet Architecture (10% Height & Hindi Only) ---- */
+/* ---- Responsive Drawer / Bottom Sheet Architecture (Hindi Only & Track-lineage enabled) ---- */
 .profile-drawer {
   position: absolute;
   background: linear-gradient(135deg, #FFFDF9 0%, #F8EFE1 100%);
@@ -187,25 +187,31 @@ svg.main-svg{width:100%; height:100%; display:block;}
   }
   .profile-drawer.open { right: 0; }
   .sheet-handle { display: none; }
+  .drawer-body { max-height: 20vh; }
+  .drawer-actions { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gold-deep); flex-shrink: 0; }
+  .drawer-actions .btn { flex: 1; justify-content: center; padding: 5px 10px; font-size: 0.66rem; }
 }
 
-/* Mobile: Compact Bottom Sheet (Strictly 10% max-height & Hindi only) */
+/* Mobile: Compact Bottom Sheet (Includes Track-lineage buttons) */
 @media (max-width: 768px) {
   .profile-drawer {
     bottom: 0; left: 0; right: 0; top: auto;
-    width: 100%; height: auto; max-height: 10vh;
+    width: 100%; height: auto; max-height: 28vh;
     border-top: 2.5px solid var(--gold);
     border-left: none;
     border-radius: 12px 12px 0 0;
     box-shadow: 0 -4px 15px rgba(0,0,0,0.35);
     transform: translateY(100%);
-    padding: 6px 12px;
+    padding: 8px 14px 12px 14px;
   }
   .profile-drawer.open { transform: translateY(0); right: 0; }
   .sheet-handle {
     width: 28px; height: 3px; background: var(--gold-deep); border-radius: 2px;
-    margin: 0 auto 3px auto; opacity: 0.6; cursor: pointer;
+    margin: 0 auto 4px auto; opacity: 0.6; cursor: pointer;
   }
+  .drawer-body { max-height: 9vh; }
+  .drawer-actions { display: flex; gap: 6px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--gold-deep); flex-shrink: 0; }
+  .drawer-actions .btn { flex: 1; justify-content: center; padding: 4px 8px; font-size: 0.62rem; }
 }
 
 .drawer-header {
@@ -222,13 +228,6 @@ svg.main-svg{width:100%; height:100%; display:block;}
 }
 .drawer-close:hover { background: var(--maroon-deep); }
 .drawer-body { flex-grow: 1; overflow-y: auto; font-size: 0.72rem; color: var(--ink); line-height: 1.3; }
-.drawer-actions { display: none; } /* Hidden on mobile 10% view to save vertical space */
-
-@media (min-width: 769px) {
-  .drawer-actions { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gold-deep); flex-shrink: 0; }
-  .drawer-actions .btn { flex: 1; justify-content: center; padding: 5px 10px; font-size: 0.66rem; }
-  .drawer-body { max-height: 20vh; }
-}
 
 @media (max-width:640px){
   .header h1{font-size:1.15rem;}
@@ -316,7 +315,7 @@ svg.main-svg{width:100%; height:100%; display:block;}
     <div class="watermark">नोड पर टैप करें &middot; पैन करने के लिए खींचें &middot; ज़ूम करें</div>
   </div>
 
-  <!-- Compact Profile Bottom Sheet (Strictly Hindi & 10% max height) -->
+  <!-- Profile Drawer / Bottom Sheet (Hindi & Track-lineage buttons included) -->
   <div class="profile-drawer" id="profileDrawer">
     <div class="sheet-handle" onclick="closeDrawer()"></div>
     <div class="drawer-header">
