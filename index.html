@@ -1097,9 +1097,14 @@ function selectNode(d){
 
   const parts = d.data.name.split('/');
   const nameHi = parts[0] ? parts[0].trim() : d.data.name;
-  const fatherName = (d.parent && d.parent.data) ? (d.parent.data.name.split('/')[0] || '').trim() : 'मूल पुरुष';
+  
+  let fatherHtml = 'मूल पुरुष';
+  if(d.parent && d.parent.data){
+    const fatherName = (d.parent.data.name.split('/')[0] || '').trim();
+    fatherHtml = `<span style="color: var(--maroon); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; font-weight: 500;" onclick="jumpToNode(${d.parent.id})" title="वंश वृक्ष में देखें">${fatherName}</span>`;
+  }
 
-  document.getElementById('drawerNameHi').innerHTML = `${nameHi} <span style="font-size:0.65rem; font-family:'Poppins',sans-serif; opacity:0.75; font-weight:400; margin-left:4px;">(पिता: ${fatherName})</span>`;
+  document.getElementById('drawerNameHi').innerHTML = `${nameHi} <span style="font-size:0.65rem; font-family:'Poppins',sans-serif; opacity:0.85; font-weight:400; margin-left:4px;">(पिता: ${fatherHtml})</span>`;
 
   const generationText = 'पीढ़ी ' + (d.depth + 1);
   const immediateChildren = d.children || d._children || [];
@@ -1118,10 +1123,10 @@ function selectNode(d){
       const childNameHi = childNameParts[0] ? childNameParts[0].trim() : child.data.name;
       if(gender === 'female'){
         daughtersCount++;
-        daughtersHtml += `<div style="color: #9C3B52; margin-bottom:2px;">• ${childNameHi}</div>`;
+        daughtersHtml += `<div style="margin-bottom:3px;"><span style="color: #9C3B52; cursor:pointer; font-weight:500; text-decoration:underline; text-underline-offset:2px;" onclick="jumpToNode(${child.id})" title="वंश वृक्ष में देखें">• ${childNameHi}</span></div>`;
       } else {
         sonsCount++;
-        sonsHtml += `<div style="color: #1B6B6F; margin-bottom:2px;">• ${childNameHi}</div>`;
+        sonsHtml += `<div style="margin-bottom:3px;"><span style="color: #1B6B6F; cursor:pointer; font-weight:500; text-decoration:underline; text-underline-offset:2px;" onclick="jumpToNode(${child.id})" title="वंश वृक्ष में देखें">• ${childNameHi}</span></div>`;
       }
     });
   }
@@ -1147,6 +1152,26 @@ function selectNode(d){
     const ty = isVertical ? (height * 0.4 - d.y * scale) : (height * 0.4 - d.x * scale);
     svg.transition().duration(350).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
   }
+}
+
+function jumpToNode(id){
+  const match = searchIndex.find(d => d.id === id);
+  if(!match) return;
+  let anc = match.parent;
+  while(anc){
+    if(anc._children){ anc.children = anc._children; anc._children = null; }
+    anc = anc.parent;
+  }
+  update(root);
+  setTimeout(() => {
+    const scale = d3.zoomTransform(svg.node()).k;
+    const tx = isVertical ? (width/2 - match.x*scale) : (width/2 - match.y*scale);
+    const ty = isVertical ? (height/2 - match.y*scale) : (height/2 - match.x*scale);
+    svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+    setTimeout(() => {
+      selectNode(match);
+    }, 550);
+  }, 50);
 }
 
 function closeDrawer(){
