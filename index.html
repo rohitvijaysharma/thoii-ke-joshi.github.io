@@ -45,7 +45,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;
 /* Rajasthani Background Watermark / Arch Motif */
 .rajasthani-bg-motif {
   position: absolute;
-  top: 55px;
+  top: 95px;
   left: 50%;
   transform: translateX(-50%);
   width: 480px;
@@ -62,16 +62,30 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;
 .corner.bl{bottom:6px;left:6px; transform:scaleY(-1);}
 .corner.br{bottom:6px;right:6px; transform:scale(-1,-1);}
 
+/* Enhanced Rajasthani Theme Banner */
 .header{
-  position:relative; text-align:center; padding:12px 60px 10px;
-  background:linear-gradient(to bottom,#FDF7E8,#F1DFB2);
-  border-bottom:2px solid var(--gold-deep);
-  box-shadow:0 2px 10px rgba(0,0,0,0.10);
+  position:relative; text-align:center; padding:10px 60px 12px;
+  background: linear-gradient(to bottom, #7A1F2B 0%, #591620 45%, #FDF7E8 45%, #F1DFB2 100%);
+  border-bottom:3px solid var(--gold);
+  box-shadow:0 4px 15px rgba(0,0,0,0.25);
   z-index:6; flex-shrink:0;
 }
-.header h1{margin:0; font-family:'Yatra One',cursive; color:var(--maroon); font-size:1.50rem; letter-spacing:0.5px;}
-.header .sub{margin:2px 0 0; font-size:0.72rem; color:#7A5A34; font-family:'Poppins',sans-serif; letter-spacing:0.5px; text-transform:uppercase;}
-.header .divider{width:150px; height:8px; margin:6px auto 0; opacity:0.8;}
+.header-decor-top {
+  display: flex; justify-content: space-between; align-items: center;
+  max-width: 520px; margin: 0 auto 2px; opacity: 0.9;
+}
+.header-decor-top svg { width: 45px; height: 18px; fill: var(--gold-light); }
+.header h1{
+  margin:0; font-family:'Yatra One',cursive; color:var(--gold-light); font-size:1.45rem; 
+  letter-spacing:0.8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+.header .sub{
+  margin:1px 0 4px; font-size:0.7rem; color:var(--parchment); font-family:'Poppins',sans-serif; 
+  letter-spacing:1px; text-transform:uppercase; font-weight: 500;
+}
+.header-bottom-motif {
+  width: 100%; height: 22px; margin: 2px auto -4px; display: block;
+}
 
 #canvas{flex-grow:1; width:100%; height:100%; cursor:grab; position:relative; z-index:2;}
 #canvas:active{cursor:grabbing;}
@@ -118,28 +132,29 @@ svg.main-svg{width:100%; height:100%; display:block;}
 .maintenance-box strong{color:var(--maroon); font-family:'Cinzel',serif; display:block; margin-bottom:1px; font-size:0.66rem;}
 .maintenance-box .contact-num{color:var(--maroon-deep); font-weight:600;}
 
-/* Top-Right Controls (Toolbar + Legend Toggle grouped near legends) */
+/* Top-Right Controls & Icon Toolbar */
 .top-controls{
   position:absolute; top:10px; right:12px; z-index:20;
   display:flex; gap:5px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
-  max-width:65%;
 }
-.toolbar{display:contents;}
+.toolbar{display:flex; gap:4px;}
 .btn{
   background:var(--maroon); color:var(--gold-light); border:1.5px solid var(--gold);
   padding:6px 10px; border-radius:20px; cursor:pointer; font-family:'Poppins',sans-serif;
   font-size:0.7rem; font-weight:600; box-shadow:0 2px 6px rgba(0,0,0,0.2);
-  transition:background 0.15s, transform 0.1s; white-space:nowrap;
+  transition:background 0.15s, transform 0.1s; white-space:nowrap; display:flex; align-items:center; gap:4px;
 }
 .btn:hover{background:var(--maroon-deep); transform:translateY(-1px);}
 .btn:active{transform:translateY(0);}
 .btn.ghost{background:var(--parchment); color:var(--maroon); border:1.5px solid var(--maroon);}
+.icon-btn{padding:6px 8px; border-radius:50%; width:32px; height:32px; justify-content:center;}
+.icon-btn svg{width:15px; height:15px; fill:currentColor; flex-shrink:0;}
 
 .search-wrap{position:absolute; top:10px; left:12px; z-index:20; display:flex; gap:6px; align-items:center;}
 .search-wrap input{
   font-family:'Poppins',sans-serif; font-size:0.76rem; padding:6px 11px; border-radius:20px;
   border:1.5px solid var(--gold-deep); background:rgba(255,253,249,0.95); color:var(--ink);
-  width:150px; outline:none;
+  width:145px; outline:none;
 }
 .search-wrap input:focus{border-color:var(--maroon);}
 .search-wrap .btn{padding:6px 9px;}
@@ -159,19 +174,19 @@ svg.main-svg{width:100%; height:100%; display:block;}
 
 .tooltip{
   position:absolute; background:#FFFDF9; border:1.5px solid var(--gold-deep); padding:6px 12px;
-  border-radius:6px; pointer-events:none; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.18);
+  border-radius:6px; pointer-events:auto; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.18);
   z-index:100; display:none; font-family:'Amita',cursive; color:var(--maroon); max-width:220px;
+  cursor: pointer;
 }
 .tooltip .hint{font-size:0.66rem; color:#7A5A34; font-family:'Poppins',sans-serif; display:block; margin-top:2px;}
 
 @media (max-width:640px){
   .header h1{font-size:1.15rem;}
-  .header{padding:9px 46px 8px;}
+  .header{padding:8px 46px 10px;}
   .search-wrap input{width:105px;}
   .legend{max-width:150px; font-size:0.66rem; top:44px;}
-  .top-controls{max-width:70%;}
   .maintenance-box{max-width:160px; font-size:0.58rem; padding:4px 7px;}
-  .btn{font-size:0.62rem; padding:5px 8px;}
+  .btn{font-size:0.62rem; padding:5px 7px;}
   .corner{width:30px; height:30px;}
 }
 </style>
@@ -216,10 +231,27 @@ svg.main-svg{width:100%; height:100%; display:block;}
 <circle cx="6" cy="13" r="1.6" fill="#C9974C"/>
 </svg></div>
 
+  <!-- Rajasthani Theme Banner Header with SVG Elements (Palaces, Desert, Rangoli, Holi, Jewelry) -->
   <div class="header">
+    <div class="header-decor-top">
+      <!-- Palace Jharokha motif left -->
+      <svg viewBox="0 0 50 18"><path d="M5,18 L5,12 C5,8 12,5 25,5 C38,5 45,8 45,12 L45,18 Z M25,2 C18,2 15,0 25,0 C35,0 32,2 25,2 Z" fill="#E7C77E"/><circle cx="25" cy="9" r="2" fill="#7A1F2B"/></svg>
+      <!-- Jewelry Borla/Rakhdi motif center -->
+      <svg viewBox="0 0 30 18"><circle cx="15" cy="9" r="6" fill="none" stroke="#E7C77E" stroke-width="1.5"/><circle cx="15" cy="9" r="3" fill="#C9974C"/><path d="M5,9 Q15,2 25,9" fill="none" stroke="#E7C77E" stroke-width="1"/></svg>
+      <!-- Palace Jharokha motif right -->
+      <svg viewBox="0 0 50 18"><path d="M5,18 L5,12 C5,8 12,5 25,5 C38,5 45,8 45,12 L45,18 Z M25,2 C18,2 15,0 25,0 C35,0 32,2 25,2 Z" fill="#E7C77E"/><circle cx="25" cy="9" r="2" fill="#7A1F2B"/></svg>
+    </div>
     <h1>&#2341;&#2379;&#2312; &#2325;&#2375; &#2332;&#2379;&#2359;&#2368; &mdash; &#2357;&#2306;&#2358;&#2366;&#2357;&#2354;&#2368;</h1>
     <div class="sub">Thoii Ke Joshi &middot; Interactive Heritage Tree</div>
-    <svg class="divider" viewBox="0 0 150 8"><line x1="0" y1="4" x2="150" y2="4" stroke="#C9974C" stroke-width="1" stroke-dasharray="1,4"/><circle cx="75" cy="4" r="3" fill="#7A1F2B"/><circle cx="60" cy="4" r="1.5" fill="#C9974C"/><circle cx="90" cy="4" r="1.5" fill="#C9974C"/></svg>
+    <!-- Bottom Heritage Motif: Desert dunes, Rangoli & Holi color accents -->
+    <svg class="header-bottom-motif" viewBox="0 0 600 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,22 L600,22 L600,12 Q500,22 400,12 Q300,2 200,12 Q100,22 0,12 Z" fill="#F1DFB2" opacity="0.6"/>
+      <path d="M0,22 L600,22 L600,16 Q450,8 300,16 Q150,24 0,16 Z" fill="#C9974C" opacity="0.4"/>
+      <!-- Rangoli / Holi dots & geometric accents -->
+      <circle cx="300" cy="8" r="3" fill="#9C3B52"/><circle cx="280" cy="11" r="2" fill="#7A1F2B"/><circle cx="320" cy="11" r="2" fill="#7A1F2B"/>
+      <circle cx="250" cy="12" r="1.5" fill="#C9974C"/><circle cx="350" cy="12" r="1.5" fill="#C9974C"/>
+      <line x1="0" y1="21" x2="600" y2="21" stroke="#C9974C" stroke-width="1.2" stroke-dasharray="3,3"/>
+    </svg>
   </div>
 
   <div id="canvas">
@@ -236,13 +268,25 @@ svg.main-svg{width:100%; height:100%; display:block;}
       संपर्क: <span class="contact-num">+91-9632588051</span>
     </div>
 
-    <!-- Top-Right Controls (Toolbar + Legend Toggle grouped together) -->
+    <!-- Top-Right Controls (Toolbar with Icon Glyphs + Legend Toggle) -->
     <div class="top-controls">
       <div class="toolbar">
-        <button class="btn ghost" onclick="toggleLayout()" id="layoutToggleBtn">लेआउट</button>
-        <button class="btn ghost" onclick="collapseAll()">समेटें</button>
-        <button class="btn ghost" onclick="expandAll()">खोलें</button>
-        <button class="btn" onclick="resetView()">रीसेट</button>
+        <button class="btn ghost icon-btn" onclick="toggleLayout()" id="layoutToggleBtn" title="लेआउट बदलें (Layout)">
+          <!-- Layout Icon -->
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v3H4zm0 8h16v3H4zm0 8h16v3H4z" opacity="0"/><path d="M10 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 h5V3zm2 18h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-7v18z"/></svg>
+        </button>
+        <button class="btn ghost icon-btn" onclick="collapseAll()" title="सब समेटें (Collapse All)">
+          <!-- Collapse Icon -->
+          <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/><path d="M12 3L4 11h5v10h6V11h5z" opacity="0.3"/></svg>
+        </button>
+        <button class="btn ghost icon-btn" onclick="expandAll()" title="सब खोलें (Expand All)">
+          <!-- Expand Icon -->
+          <svg viewBox="0 0 24 24"><path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/></svg>
+        </button>
+        <button class="btn icon-btn" onclick="resetView()" title="रीसेट (Reset View)">
+          <!-- Reset / Center Icon -->
+          <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+        </button>
       </div>
       <button class="btn ghost legend-toggle" onclick="toggleLegend()">&#9776; परिचय</button>
     </div>
@@ -260,7 +304,7 @@ svg.main-svg{width:100%; height:100%; display:block;}
   </div>
 </div>
 
-<div class="tooltip" id="tooltip"></div>
+<div class="tooltip" id="tooltip" onclick="toggleTooltipPin(event)"></div>
 
 <script>
 const rawData = {
@@ -816,7 +860,6 @@ const container = document.getElementById('canvas');
 const width = container.clientWidth || window.innerWidth;
 const height = container.clientHeight || window.innerHeight;
 
-// Auto-configure layout based on screen width: vertical for mobile (<768px), horizontal for desktops
 let isVertical = width < 768;
 
 let i = 0;
@@ -873,6 +916,54 @@ function applyInitialTransform(){
   }
 }
 
+/* ---------------- Tooltip Timer & Pin State Logic ---------------- */
+let tooltipTimeout = null;
+let isTooltipPinned = false;
+
+function showTooltip(htmlContent, pageX, pageY, isPinned = false) {
+  const tt = document.getElementById('tooltip');
+  if (tooltipTimeout) {
+    clearTimeout(tooltipTimeout);
+    tooltipTimeout = null;
+  }
+  tt.innerHTML = htmlContent;
+  tt.style.display = 'block';
+  tt.style.left = (pageX + 16) + 'px';
+  tt.style.top = (pageY - 12) + 'px';
+
+  if (isPinned) {
+    isTooltipPinned = true;
+    return;
+  }
+
+  isTooltipPinned = false;
+  tooltipTimeout = setTimeout(() => {
+    if (!isTooltipPinned) {
+      tt.style.display = 'none';
+    }
+  }, 3000);
+}
+
+function toggleTooltipPin(event) {
+  event.stopPropagation();
+  const tt = document.getElementById('tooltip');
+  isTooltipPinned = !isTooltipPinned;
+  if (!isTooltipPinned) {
+    tt.style.display = 'none';
+  }
+}
+
+function hideTooltip() {
+  if (!isTooltipPinned) {
+    const tt = document.getElementById('tooltip');
+    if (tooltipTimeout) {
+      clearTimeout(tooltipTimeout);
+      tooltipTimeout = null;
+    }
+    tt.style.display = 'none';
+  }
+}
+
 function update(source){
   const breadthSpacing = isVertical ? 150 : 38;
   const depthSpacing = isVertical ? 110 : 225;
@@ -923,24 +1014,37 @@ function update(source){
       return isVertical ? `translate(${source.x0},${source.y0})` : `translate(${source.y0},${source.x0})`;
     })
     .on('click', (event, d) => {
+      event.stopPropagation();
+      const state = d.children ? 'शाखा समेटने के लिए क्लिक करें' : (d._children ? 'शाखा खोलने के लिए क्लिक करें' : 'परिवार के सदस्य');
+      const htmlContent = `<strong>${d.data.name}</strong><span class="hint">${state} (टैप करके बंद करें)</span>`;
+      
+      const tt = document.getElementById('tooltip');
+      if (tt.style.display === 'block' && isTooltipPinned) {
+        // If already pinned, second tap dismisses it
+        isTooltipPinned = false;
+        tt.style.display = 'none';
+      } else {
+        showTooltip(htmlContent, event.pageX, event.pageY, true);
+      }
+
       if(d.children){ d._children = d.children; d.children = null; }
       else if(d._children){ d.children = d._children; d._children = null; }
       update(d);
     })
     .on('mouseover', (event, d) => {
-      const tt = document.getElementById('tooltip');
-      tt.style.display = 'block';
+      if(isTooltipPinned) return;
       const state = d.children ? 'शाखा समेटने के लिए क्लिक करें' : (d._children ? 'शाखा खोलने के लिए क्लिक करें' : 'परिवार के सदस्य');
-      tt.innerHTML = `<strong>${d.data.name}</strong><span class="hint">${state}</span>`;
-      tt.style.left = (event.pageX + 16) + 'px';
-      tt.style.top = (event.pageY - 12) + 'px';
+      showTooltip(`<strong>${d.data.name}</strong><span class="hint">${state}</span>`, event.pageX, event.pageY, false);
     })
     .on('mousemove', (event) => {
+      if(isTooltipPinned) return;
       const tt = document.getElementById('tooltip');
       tt.style.left = (event.pageX + 16) + 'px';
       tt.style.top = (event.pageY - 12) + 'px';
     })
-    .on('mouseout', () => { document.getElementById('tooltip').style.display = 'none'; });
+    .on('mouseout', () => {
+      hideTooltip();
+    });
 
   nodeEnter.append('circle').attr('class','pulse-ring').attr('r', 12);
 
@@ -1051,9 +1155,6 @@ function update(source){
   nodeExit.select('text').style('fill-opacity', 1e-6);
 
   nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
-
-  const btnText = isVertical ? 'क्षैतिज (Horizontal)' : 'लंबवत (Vertical)';
-  document.getElementById('layoutToggleBtn').textContent = btnText;
 }
 
 function diagonal(s, t, vertical){
