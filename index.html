@@ -181,12 +181,12 @@ svg.main-svg{width:100%; height:100%; display:block;}
 
 @media (min-width: 769px) {
   .profile-drawer {
-    top: 0; right: -360px; width: 340px; height: 100%;
+    top: 0; right: -380px; width: 360px; height: 100%;
     border-left: 3px solid var(--gold);
   }
   .profile-drawer.open { right: 0; }
   .sheet-handle { display: none; }
-  .drawer-body { max-height: 20vh; }
+  .drawer-body { max-height: calc(100vh - 120px); }
   .drawer-actions { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gold-deep); flex-shrink: 0; }
   .drawer-actions .btn { flex: 1; justify-content: center; padding: 5px 10px; font-size: 0.66rem; }
 }
@@ -194,7 +194,7 @@ svg.main-svg{width:100%; height:100%; display:block;}
 @media (max-width: 768px) {
   .profile-drawer {
     bottom: 0; left: 0; right: 0; top: auto;
-    width: 100%; height: auto; max-height: 28vh;
+    width: 100%; height: auto; max-height: 34vh;
     border-top: 2.5px solid var(--gold);
     border-left: none;
     border-radius: 12px 12px 0 0;
@@ -207,7 +207,7 @@ svg.main-svg{width:100%; height:100%; display:block;}
     width: 28px; height: 3px; background: var(--gold-deep); border-radius: 2px;
     margin: 0 auto 4px auto; opacity: 0.6; cursor: pointer;
   }
-  .drawer-body { max-height: 9vh; }
+  .drawer-body { max-height: 14vh; }
   .drawer-actions { display: flex; gap: 6px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--gold-deep); flex-shrink: 0; }
   .drawer-actions .btn { flex: 1; justify-content: center; padding: 4px 8px; font-size: 0.62rem; }
 }
@@ -517,7 +517,7 @@ const rawData = {
                                                           "name": "दीपक जी / Deepak Ji",
                                                           "children": [
                                                             { "name": "षष्ठी जी / Shashthi Ji" },
-                                                            { "name": "उमा जीजी / Uma Gigi" }
+                                                            { "name": "उमा जीजी / Uma JiJi" }
                                                           ]
                                                         }
                                                       ]
@@ -528,8 +528,8 @@ const rawData = {
                                                         {
                                                           "name": "रोहित जी / Rohit Ji",
                                                           "children": [
-                                                            { "name": "तान्या जीजी / Tanya Gigi" },
-                                                            { "name": "कृतिका जीजी / Kritika Gigi" }
+                                                            { "name": "तान्या जीजी / Tanya JiJi" },
+                                                            { "name": "कृतिका जीजी / Kritika JiJi" }
                                                           ]
                                                         },
                                                         { "name": "गौरव जी / Gaurav Ji" }
@@ -541,15 +541,15 @@ const rawData = {
                                                         {
                                                           "name": "अमित जी / Amit Ji",
                                                           "children": [
-                                                            { "name": "ऐश्वर्या जीजी / Aishwarya Gigi" },
-                                                            { "name": "पूर्वा जीजी / Purva Gigi" }
+                                                            { "name": "ऐश्वर्या जीजी / Aishwarya JiJi" },
+                                                            { "name": "पूर्वा जीजी / Purva JiJi" }
                                                           ]
                                                         },
                                                         {
                                                           "name": "सुमित जी / Sumit Ji",
                                                           "children": [
                                                             { "name": "रौनाक जी / Raunak Ji" },
-                                                            { "name": "प्रियांशी जीजी / Priyanshi Gigi" }
+                                                            { "name": "प्रियांशी जीजी / Priyanshi JiJi" }
                                                           ]
                                                         }
                                                       ]
@@ -557,14 +557,14 @@ const rawData = {
                                                     {
                                                       "name": "शिवशंकर जी / Shivshankar Ji",
                                                       "children": [
-                                                        { "name": "चांदनी जीजी / Chandani Gigi" }
+                                                        { "name": "चांदनी जीजी / Chandani JiJi" }
                                                       ]
                                                     },
                                                     {
                                                       "name": "गिरधारी जी / Girdhari Ji",
                                                       "children": [
                                                         { "name": "आयुष जी / Ayush Ji" },
-                                                        { "name": "खुशबू जीजी / Khushboo Gigi" }
+                                                        { "name": "खुशबू जीजी / Khushboo JiJi" }
                                                       ]
                                                     },
                                                     {
@@ -574,7 +574,7 @@ const rawData = {
                                                         { "name": "हिमांशु जी / Himanshu Ji" }
                                                       ]
                                                     },
-                                                    { "name": "पूर्णिमा जीजी / Purnima Gigi" }
+                                                    { "name": "पूर्णिमा जीजी / Purnima JiJi" }
                                                   ]
                                                 },
                                                 {
@@ -584,25 +584,25 @@ const rawData = {
                                                       "name": "महिंद्र प्रताप जी / Mahindra Pratap Ji",
                                                       "children": [
                                                         { "name": "द्विगम् जी / Dvigam Ji" },
-                                                        { "name": "तनु जीजी / Tanu Gigi" }
+                                                        { "name": "तनु जीजी / Tanu JiJi" }
                                                       ]
                                                     },
-                                                    { "name": "कौशल्या जीजी / Kaushalya Gigi" },
-                                                    { "name": "चंचल जीजी / Chanchal Gigi" },
-                                                    { "name": "विजया जीजी / Vijaya Gigi" },
-                                                    { "name": "रेखा जीजी / Rekha Gigi" }
+                                                    { "name": "कौशल्या जीजी / Kaushalya JiJi" },
+                                                    { "name": "चंचल जीजी / Chanchal JiJi" },
+                                                    { "name": "विजया जीजी / Vijaya JiJi" },
+                                                    { "name": "रेखा जीजी / Rekha JiJi" }
                                                   ]
                                                 },
                                                 {
                                                   "name": "बनवारी दत्त जी / Banwari Datt Ji",
                                                   "children": [
-                                                    { "name": "नलिनी जीजी / Nalini Gigi" },
-                                                    { "name": "लता जीजी / Lata Gigi" },
+                                                    { "name": "नलिनी जीजी / Nalini JiJi" },
+                                                    { "name": "लता जीजी / Lata JiJi" },
                                                     {
                                                       "name": "ललित जी / Lalit Ji",
                                                       "children": [
                                                         { "name": "विवेक जी / Vivek Ji" },
-                                                        { "name": "सेजल जीजी / Sejal Gigi" }
+                                                        { "name": "सेजल जीजी / Sejal JiJi" }
                                                       ]
                                                     }
                                                   ]
@@ -625,7 +625,7 @@ const rawData = {
                                                               "name": "संजीव जी / Sanjeev Ji",
                                                               "children": [
                                                                 { "name": "खुश जी / Khush Ji" },
-                                                                { "name": "शैलजा जीजी / Shailja Gigi" }
+                                                                { "name": "शैलजा जीजी / Shailja JiJi" }
                                                             ]
                                                             },
                                                             { "name": "देवेंद्र जी / Devendra Ji" },
@@ -639,13 +639,13 @@ const rawData = {
                                                               "name": "अमित जी / Amit Ji",
                                                               "children": [
                                                                 { "name": "आदित्य जी / Aditya Ji" },
-                                                                { "name": "सोमिला जीजी / Somila Gigi" }
+                                                                { "name": "सोमिला जीजी / Somila JiJi" }
                                                               ]
                                                             },
                                                             {
                                                               "name": "रवि जी / Ravi Ji",
                                                               "children": [
-                                                                { "name": "रुद्राक्षी जीजी / Rudrakshi Gigi" }
+                                                                { "name": "रुद्राक्षी जीजी / Rudrakshi JiJi" }
                                                               ]
                                                             }
                                                           ]
@@ -653,7 +653,7 @@ const rawData = {
                                                         {
                                                           "name": "सुधीर जी / Sudhir Ji",
                                                           "children": [
-                                                            { "name": "सुरभि जीजी / Surbhi Gigi" },
+                                                            { "name": "सुरभि जीजी / Surbhi JiJi" },
                                                             { "name": "अभिनव जी / Abhinav Ji" }
                                                           ]
                                                         }
@@ -664,7 +664,7 @@ const rawData = {
                                                       "children": [
                                                         { "name": "मनीष जी / Manish Ji" },
                                                         { "name": "शिव जी / Shiv Ji" },
-                                                        { "name": "कलावती जीजी / Kalawati Gigi" }
+                                                        { "name": "कलावती जीजी / Kalawati JiJi" }
                                                       ]
                                                     },
                                                     {
@@ -682,12 +682,12 @@ const rawData = {
                                                             { "name": "पार्थ जी / Parth Ji" }
                                                           ]
                                                         },
-                                                        { "name": "मनीषा जीजी / Manisha Gigi" }
+                                                        { "name": "मनीषा जीजी / Manisha JiJi" }
                                                       ]
                                                     },
-                                                    { "name": "प्रमिला जीजी / Pramila Gigi" },
-                                                    { "name": "मधु जीजी / Madhu Gigi" },
-                                                    { "name": "अन्नू जीजी / Annu Gigi" }
+                                                    { "name": "प्रमिला जीजी / Pramila JiJi" },
+                                                    { "name": "मधु जीजी / Madhu JiJi" },
+                                                    { "name": "अन्नू जीजी / Annu JiJi" }
                                                   ]
                                                 },
                                                 {
@@ -699,9 +699,9 @@ const rawData = {
                                                         { "name": "सौरभ जी / Saurabh Ji" }
                                                       ]
                                                     },
-                                                    { "name": "विमला देवी जीजी / Vimla Devi Gigi" },
-                                                    { "name": "शारदा देवी जीजी / Sharda Devi Gigi" },
-                                                    { "name": "गायत्री देवी जीजी / Gayatri Devi Gigi" }
+                                                    { "name": "विमला देवी जीजी / Vimla Devi JiJi" },
+                                                    { "name": "शारदा देवी जीजी / Sharda Devi JiJi" },
+                                                    { "name": "गायत्री देवी जीजी / Gayatri Devi JiJi" }
                                                   ]
                                                 },
                                                 {
@@ -711,12 +711,12 @@ const rawData = {
                                                       "name": "अशोक जी / Ashok Ji",
                                                       "children": [
                                                         { "name": "पुर्व / Purv" },
-                                                        { "name": "माधुरी जीजी / Madhuri Gigi" }
+                                                        { "name": "माधुरी जीजी / Madhuri JiJi" }
                                                       ]
                                                     },
-                                                    { "name": "पुष्पा देवी जीजी / Pushpa Devi Gigi" },
-                                                    { "name": "श्यामा देवी जीजी / Shyama Devi Gigi" },
-                                                    { "name": "सावित्री देवी जीजी / Savitri Devi Gigi" }
+                                                    { "name": "पुष्पा देवी जीजी / Pushpa Devi JiJi" },
+                                                    { "name": "श्यामा देवी जीजी / Shyama Devi JiJi" },
+                                                    { "name": "सावित्री देवी जीजी / Savitri Devi JiJi" }
                                                   ]
                                                 },
                                                 {
@@ -727,7 +727,7 @@ const rawData = {
                                                       "children": [
                                                         { "name": "दीपक जी / Deepak Ji" },
                                                         { "name": "राहुल जी / Rahul Ji" },
-                                                        { "name": "ज्योति जीजी / Jyoti Gigi" }
+                                                        { "name": "ज्योति जीजी / Jyoti JiJi" }
                                                       ]
                                                     },
                                                     {
@@ -738,9 +738,9 @@ const rawData = {
                                                       ]
                                                     },
                                                     { "name": "पुरुषोत्तम जी / Purushottam Ji" },
-                                                    { "name": "सत्यभामा जीजी / Satyabhama Gigi" },
-                                                    { "name": "कुसुम जीजी / Kusum Gigi" },
-                                                    { "name": "अन्नपूर्णा जीजी / Annapurna Gigi" }
+                                                    { "name": "सत्यभामा जीजी / Satyabhama JiJi" },
+                                                    { "name": "कुसुम जीजी / Kusum JiJi" },
+                                                    { "name": "अन्नपूर्णा जीजी / Annapurna JiJi" }
                                                   ]
                                                 },
                                                 {
@@ -753,7 +753,7 @@ const rawData = {
                                                         { "name": "गौरव जी / Gaurav Ji" }
                                                       ]
                                                     },
-                                                    { "name": "सुधा देवी जीजी / Sudha Devi Gigi" }
+                                                    { "name": "सुधा देवी जीजी / Sudha Devi JiJi" }
                                                   ]
                                                 },
                                                 {
@@ -763,18 +763,18 @@ const rawData = {
                                                       "name": "सीताराम जी / Sitaram Ji",
                                                       "children": [
                                                         { "name": "आलोक जी / Alok Ji" },
-                                                        { "name": "ऋतु जीजी / Ritu Gigi" },
-                                                        { "name": "रचना जीजी / Rachna Gigi" },
-                                                        { "name": "अमृता जीजी / Amrita Gigi" }
+                                                        { "name": "ऋतु जीजी / Ritu JiJi" },
+                                                        { "name": "रचना जीजी / Rachna JiJi" },
+                                                        { "name": "अमृता जीजी / Amrita JiJi" }
                                                       ]
                                                     },
                                                     { "name": "रमेश जी / Ramesh Ji" },
-                                                    { "name": "कमला देवी जीजी / Kamala Devi Gigi" },
-                                                    { "name": "प्रेमलता देवी जीजी / Premlata Devi Gigi" }
+                                                    { "name": "कमला देवी जीजी / Kamala Devi JiJi" },
+                                                    { "name": "प्रेमलता देवी जीजी / Premlata Devi JiJi" }
                                                   ]
                                                 },
-                                                { "name": "सरस्वती जीजी / Saraswati Gigi" },
-                                                { "name": "शांति जीजी / Shanti Gigi" }
+                                                { "name": "सरस्वती जीजी / Saraswati JiJi" },
+                                                { "name": "शांति जीजी / Shanti JiJi" }
                                               ]
                                             }
                                           ]
@@ -808,7 +808,7 @@ function getGender(name, isRoot){
   if(isRoot) return 'root';
   const cleanName = (name||'').split('/')[0].trim();
   const engPart = (name||'').split('/')[1] ? (name||'').split('/')[1].trim().toLowerCase() : '';
-  if(cleanName.endsWith('जीजी') || engPart.includes('gigi')) return 'female';
+  if(cleanName.endsWith('जीजी') || engPart.includes('jiji') || engPart.includes('gigi')) return 'female';
   if(cleanName.endsWith('जी') || engPart === 'purv' || cleanName === 'पुर्व' || cleanName === 'पूर्व') return 'male';
   const tokens = cleanName.split(/\s+/);
   const last = (tokens[tokens.length-1]||'');
@@ -994,36 +994,41 @@ function update(source){
     }
   });
 
-  // Re-added both Devanagari and English name tspans
   const textSel = nodeEnter.append('text')
     .attr('class', d => 'label ' + d.gender)
     .attr('x', d => isVertical ? 0 : ((d.children || d._children) ? -18 : 18))
     .attr('text-anchor', d => isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start'))
     .style('fill-opacity', 1e-6);
 
-  // Devanagari Name Line
-  textSel.append('tspan')
-    .attr('x', d => isVertical ? 0 : ((d.children || d._children) ? -18 : 18))
-    .attr('dy', d => isVertical ? '1.5em' : '-0.2em')
-    .attr('font-size', '11.5px')
-    .attr('font-weight', '600')
-    .attr('text-anchor', d => isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start'))
-    .text(d => {
-      const parts = d.data.name.split('/');
-      return parts[0] ? parts[0].trim() : d.data.name;
-    });
+  textSel.each(function(d){
+    const el = d3.select(this);
+    const parts = d.data.name.split('/');
+    const hi = parts[0] ? parts[0].trim() : d.data.name;
+    const en = parts[1] ? parts[1].trim() : '';
+    const xVal = isVertical ? 0 : ((d.children || d._children) ? -18 : 18);
+    const anchorVal = isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start');
 
-  // English Name Line
-  textSel.append('tspan')
-    .attr('x', d => isVertical ? 0 : ((d.children || d._children) ? -18 : 18))
-    .attr('dy', d => isVertical ? '1.2em' : '1.1em')
-    .attr('font-size', '9.5px')
-    .style('opacity', '0.72')
-    .attr('text-anchor', d => isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start'))
-    .text(d => {
-      const parts = d.data.name.split('/');
-      return parts[1] ? parts[1].trim() : '';
-    });
+    // Devanagari line (Top)
+    el.append('tspan')
+      .attr('x', xVal)
+      .attr('dy', isVertical ? '1.4em' : '-0.3em')
+      .attr('font-size', '11.5px')
+      .attr('font-weight', '600')
+      .attr('text-anchor', anchorVal)
+      .text(hi);
+
+    // English line (Bottom)
+    if(en){
+      el.append('tspan')
+        .attr('x', xVal)
+        .attr('dy', '1.2em')
+        .attr('font-size', '10px')
+        .attr('font-weight', '400')
+        .attr('text-anchor', anchorVal)
+        .style('opacity', '0.82')
+        .text(en);
+    }
+  });
 
   const nodeUpdate = node.merge(nodeEnter);
   nodeUpdate.attr('class', d => {
@@ -1126,16 +1131,48 @@ function selectNode(d){
 
   const parts = d.data.name.split('/');
   const nameHi = parts[0] ? parts[0].trim() : d.data.name;
-  const nameEn = parts[1] ? parts[1].trim() : '';
-  document.getElementById('drawerNameHi').innerHTML = `${nameHi} <span style="font-size:0.75rem; font-family:'Poppins',sans-serif; opacity:0.7; font-weight:400;">(${nameEn})</span>`;
+  const fatherName = (d.parent && d.parent.data) ? (d.parent.data.name.split('/')[0] || '').trim() : 'मूल पुरुष';
+
+  document.getElementById('drawerNameHi').innerHTML = `${nameHi} <span style="font-size:0.68rem; font-family:'Poppins',sans-serif; opacity:0.8; font-weight:400; margin-left:6px;">(पिता: ${fatherName})</span>`;
 
   const generationText = 'पीढ़ी ' + (d.depth + 1);
-  let statusText = 'स्वतंत्र शाखा';
-  if(!d.children && !d._children) statusText = 'अंतिम सदस्य';
-  else if(d._children) statusText = 'बंद शाखा (' + d._children.length + ' छिपे)';
-  else if(d.children) statusText = 'खुली शाखा (' + d.children.length + ' शाखा)';
+  const immediateChildren = d.children || d._children || [];
+  
+  let sonsHtml = '';
+  let daughtersHtml = '';
+  let sonsCount = 0;
+  let daughtersCount = 0;
 
-  document.getElementById('drawerDetailsText').innerHTML = `<strong>${generationText}</strong> &bull; ${statusText}`;
+  if(immediateChildren.length === 0){
+    sonsHtml = '<div style="opacity:0.7;">अंतिम सदस्य</div>';
+  } else {
+    immediateChildren.forEach(child => {
+      const gender = getGender(child.data.name, false);
+      const childNameParts = child.data.name.split('/');
+      const childNameHi = childNameParts[0] ? childNameParts[0].trim() : child.data.name;
+      if(gender === 'female'){
+        daughtersCount++;
+        daughtersHtml += `<div style="color: #9C3B52; margin-bottom:2px;">• ${childNameHi}</div>`;
+      } else {
+        sonsCount++;
+        sonsHtml += `<div style="color: #1B6B6F; margin-bottom:2px;">• ${childNameHi}</div>`;
+      }
+    });
+  }
+
+  document.getElementById('drawerDetailsText').innerHTML = `
+    <div style="margin-bottom:4px; font-weight:600; color:var(--maroon);">${generationText}</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+      <div>
+        <div style="font-weight: 600; color: #1B6B6F; font-size: 0.68rem; border-bottom: 1px solid rgba(27,107,111,0.2); margin-bottom: 3px;">पुत्र (${sonsCount})</div>
+        ${sonsHtml || '<div style="opacity:0.5;">-</div>'}
+      </div>
+      <div>
+        <div style="font-weight: 600; color: #9C3B52; font-size: 0.68rem; border-bottom: 1px solid rgba(156,59,82,0.2); margin-bottom: 3px;">पुत्रियां (${daughtersCount})</div>
+        ${daughtersHtml || '<div style="opacity:0.5;">-</div>'}
+      </div>
+    </div>
+  `;
   document.getElementById('profileDrawer').classList.add('open');
 
   if(window.innerWidth <= 768){
