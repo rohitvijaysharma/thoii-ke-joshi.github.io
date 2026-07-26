@@ -1,0 +1,13 @@
+/* Desktop Hover Setup */
+@media (hover: hover) and (pointer: fine) {
+  .interactive-card:hover .tooltip-content {
+    display: block;
+  }
+}
+
+/* Mobile Touch Setup */
+@media (hover: none) and (pointer: coarse) {
+  .interactive-card.is-active .tooltip-content {
+    display: block;
+  }
+}
