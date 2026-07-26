@@ -209,9 +209,22 @@ svg.main-svg{width:100%; height:100%; display:block;}
   display: flex; justify-content: space-between; align-items: center;
   border-bottom: 1px solid var(--gold-deep); padding-bottom: 4px; margin-bottom: 4px;
 }
+.drawer-title-area {
+  display: flex; align-items: center; gap: 6px; min-width: 0; flex-grow: 1;
+}
 .drawer-title-area h3 {
   margin: 0; font-family: 'Yatra One', cursive; color: var(--maroon); font-size: 0.9rem; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+.drawer-back {
+  background: rgba(122, 31, 43, 0.08); border: 1px solid var(--gold-deep); color: var(--maroon); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px;
+  font-family: 'Poppins', sans-serif; font-size: 0.65rem; font-weight: 500;
+  transition: background 0.2s; flex-shrink: 0;
+}
+.drawer-back:hover { background: rgba(122, 31, 43, 0.15); }
+.drawer-back svg { width: 12px; height: 12px; fill: currentColor; }
+
 .drawer-close {
   background: var(--maroon); color: var(--gold-light); border: none; width: 20px; height: 20px;
   border-radius: 50%; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
@@ -286,7 +299,13 @@ svg.main-svg{width:100%; height:100%; display:block;}
       <div class="drawer-title-area">
         <h3 id="drawerNameHi">विवरण</h3>
       </div>
-      <button class="drawer-close" onclick="closeDrawer()">&times;</button>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <button class="drawer-back" id="drawerBackButton" onclick="goBackNode()" title="पिछला सदस्य" style="display: none;">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          <span>पिछला</span>
+        </button>
+        <button class="drawer-close" onclick="closeDrawer()">&times;</button>
+      </div>
     </div>
     <div class="drawer-body">
       <div id="drawerDetailsText">विवरण देखने के लिए किसी सदस्य पर टैप करें।</div>
@@ -855,6 +874,7 @@ assignLineageColor(root, TRUNK_COLOR);
 
 const searchIndex = root.descendants();
 let selectedNode = null;
+let nodeHistory = [];
 
 root.x0 = height / 2;
 root.y0 = 40;
@@ -1088,8 +1108,12 @@ function diagonal(s, t, vertical){
   return `M ${s.y} ${s.x} C ${(s.y+t.y)/2} ${s.x}, ${(s.y+t.y)/2} ${t.x}, ${t.y} ${t.x}`;
 }
 
-function selectNode(d){
+function selectNode(d, isBack = false){
+  if(selectedNode && selectedNode !== d && !isBack){
+    nodeHistory.push(selectedNode);
+  }
   selectedNode = d;
+  updateBackButtonVisibility();
   
   if(d.children){ d._children = d.children; d.children = null; }
   else if(d._children){ d.children = d._children; d._children = null; }
@@ -1154,6 +1178,40 @@ function selectNode(d){
   }
 }
 
+function updateBackButtonVisibility(){
+  const backBtn = document.getElementById('drawerBackButton');
+  if(backBtn){
+    if(nodeHistory.length > 0){
+      backBtn.style.display = 'inline-flex';
+    } else {
+      backBtn.style.display = 'none';
+    }
+  }
+}
+
+function goBackNode(){
+  if(nodeHistory.length === 0) return;
+  const prevNode = nodeHistory.pop();
+  updateBackButtonVisibility();
+  if(prevNode){
+    let anc = prevNode.parent;
+    while(anc){
+      if(anc._children){ anc.children = anc._children; anc._children = null; }
+      anc = anc.parent;
+    }
+    update(root);
+    setTimeout(() => {
+      const scale = d3.zoomTransform(svg.node()).k;
+      const tx = isVertical ? (width/2 - prevNode.x*scale) : (width/2 - prevNode.y*scale);
+      const ty = isVertical ? (height/2 - prevNode.y*scale) : (height/2 - prevNode.x*scale);
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+      setTimeout(() => {
+        selectNode(prevNode, true);
+      }, 550);
+    }, 50);
+  }
+}
+
 function jumpToNode(id){
   const match = searchIndex.find(d => d.id === id);
   if(!match) return;
@@ -1176,6 +1234,8 @@ function jumpToNode(id){
 
 function closeDrawer(){
   document.getElementById('profileDrawer').classList.remove('open');
+  nodeHistory = [];
+  updateBackButtonVisibility();
   clearFocusState();
 }
 
