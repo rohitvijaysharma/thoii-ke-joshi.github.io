@@ -79,7 +79,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;
 #canvas{
   grid-row: 2;
   width:100%; height:100%; cursor:grab; position:relative; z-index:2;
-  min-height: 0; min-width: 0; /* Crucial fix to prevent grid container collapse on desktop/mobile */
+  min-height: 0; min-width: 0;
   touch-action: none;
 }
 #canvas:active{cursor:grabbing;}
@@ -105,7 +105,7 @@ svg.main-svg{width:100%; height:100%; display:block;}
 }
 
 .node text.label{
-  paint-order:stroke; stroke:var(--parchment); stroke-width:4px; stroke-linejoin:round;
+  paint-order:stroke; stroke:var(--parchment); stroke-width:3px; stroke-linejoin:round;
 }
 .node .label.male{font-family:'Cinzel',serif; font-weight:600; fill:var(--ink);}
 .node .label.female{font-family:'Amita',cursive; font-weight:700; font-style:italic; fill:var(--rose);}
@@ -169,7 +169,7 @@ svg.main-svg{width:100%; height:100%; display:block;}
 .legend svg{flex-shrink:0;}
 .legend .note{margin-top:8px; paddingTop:7px; border-top:1px dashed var(--gold-deep); color:#7A5A34; font-size:0.65rem; line-height:1.35;}
 
-/* ---- Responsive Drawer / Bottom Sheet Architecture (Hindi Only & Track-lineage enabled) ---- */
+/* ---- Responsive Drawer / Bottom Sheet Architecture ---- */
 .profile-drawer {
   position: absolute;
   background: linear-gradient(135deg, #FFFDF9 0%, #F8EFE1 100%);
@@ -179,7 +179,6 @@ svg.main-svg{width:100%; height:100%; display:block;}
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Desktop: Right-Side Drawer */
 @media (min-width: 769px) {
   .profile-drawer {
     top: 0; right: -360px; width: 340px; height: 100%;
@@ -192,7 +191,6 @@ svg.main-svg{width:100%; height:100%; display:block;}
   .drawer-actions .btn { flex: 1; justify-content: center; padding: 5px 10px; font-size: 0.66rem; }
 }
 
-/* Mobile: Compact Bottom Sheet (Includes Track-lineage buttons) */
 @media (max-width: 768px) {
   .profile-drawer {
     bottom: 0; left: 0; right: 0; top: auto;
@@ -315,7 +313,6 @@ svg.main-svg{width:100%; height:100%; display:block;}
     <div class="watermark">नोड पर टैप करें &middot; पैन करने के लिए खींचें &middot; ज़ूम करें</div>
   </div>
 
-  <!-- Profile Drawer / Bottom Sheet (Hindi & Track-lineage buttons included) -->
   <div class="profile-drawer" id="profileDrawer">
     <div class="sheet-handle" onclick="closeDrawer()"></div>
     <div class="drawer-header">
@@ -935,8 +932,8 @@ function applyInitialTransform(){
 }
 
 function update(source){
-  const breadthSpacing = isVertical ? 150 : 38;
-  const depthSpacing = isVertical ? 110 : 225;
+  const breadthSpacing = isVertical ? 170 : 44;
+  const depthSpacing = isVertical ? 120 : 240;
   const treeLayout = d3.tree().nodeSize([breadthSpacing, depthSpacing]);
 
   const treeData = treeLayout(root);
@@ -944,7 +941,7 @@ function update(source){
   const links = treeData.links();
 
   nodes.forEach(d => {
-    d.y = d.depth * (isVertical ? 110 : 225);
+    d.y = d.depth * (isVertical ? 120 : 240);
   });
 
   updateSwimlanes();
@@ -997,20 +994,35 @@ function update(source){
     }
   });
 
+  // Re-added both Devanagari and English name tspans
   const textSel = nodeEnter.append('text')
     .attr('class', d => 'label ' + d.gender)
-    .attr('dy', d => isVertical ? '1.6em' : '0.25em')
     .attr('x', d => isVertical ? 0 : ((d.children || d._children) ? -18 : 18))
     .attr('text-anchor', d => isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start'))
     .style('fill-opacity', 1e-6);
 
+  // Devanagari Name Line
   textSel.append('tspan')
     .attr('x', d => isVertical ? 0 : ((d.children || d._children) ? -18 : 18))
+    .attr('dy', d => isVertical ? '1.5em' : '-0.2em')
     .attr('font-size', '11.5px')
+    .attr('font-weight', '600')
     .attr('text-anchor', d => isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start'))
     .text(d => {
       const parts = d.data.name.split('/');
       return parts[0] ? parts[0].trim() : d.data.name;
+    });
+
+  // English Name Line
+  textSel.append('tspan')
+    .attr('x', d => isVertical ? 0 : ((d.children || d._children) ? -18 : 18))
+    .attr('dy', d => isVertical ? '1.2em' : '1.1em')
+    .attr('font-size', '9.5px')
+    .style('opacity', '0.72')
+    .attr('text-anchor', d => isVertical ? 'middle' : ((d.children || d._children) ? 'end' : 'start'))
+    .text(d => {
+      const parts = d.data.name.split('/');
+      return parts[1] ? parts[1].trim() : '';
     });
 
   const nodeUpdate = node.merge(nodeEnter);
@@ -1073,8 +1085,8 @@ function updateSwimlanes(){
   swimlaneLayer.selectAll('*').remove();
   const maxDepth = d3.max(root.descendants(), d => d.depth) || 0;
   for(let d=0; d<=maxDepth; d++){
-    const pos = d * (isVertical ? 110 : 225);
-    const size = isVertical ? 110 : 225;
+    const pos = d * (isVertical ? 120 : 240);
+    const size = isVertical ? 120 : 240;
     const band = swimlaneLayer.append('g');
     if(isVertical){
       band.append('rect')
@@ -1114,7 +1126,8 @@ function selectNode(d){
 
   const parts = d.data.name.split('/');
   const nameHi = parts[0] ? parts[0].trim() : d.data.name;
-  document.getElementById('drawerNameHi').textContent = nameHi;
+  const nameEn = parts[1] ? parts[1].trim() : '';
+  document.getElementById('drawerNameHi').innerHTML = `${nameHi} <span style="font-size:0.75rem; font-family:'Poppins',sans-serif; opacity:0.7; font-weight:400;">(${nameEn})</span>`;
 
   const generationText = 'पीढ़ी ' + (d.depth + 1);
   let statusText = 'स्वतंत्र शाखा';
