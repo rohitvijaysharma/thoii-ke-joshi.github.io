@@ -11,3 +11,33 @@
     display: block;
   }
 }
+
+
+/* Ensure the tree container allows smooth scrolling/panning */
+.tree-container {
+  overflow: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Node layout transition */
+.family-node {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mobile-specific expansion layout adjustment */
+@media (hover: none) and (pointer: coarse) {
+  .family-node.is-active {
+    transform: scale(1.02);
+    /* Bring active branch forward */
+    z-index: 10; 
+  }
+  
+  /* Expand the subtree or recent hierarchy container when active */
+  .family-node.is-active .sub-hierarchy {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    max-height: 500px;
+  }
+}
