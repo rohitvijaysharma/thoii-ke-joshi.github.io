@@ -1262,5 +1262,38 @@ function doSearch(){
     }
   });
 </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+        const familyNodes = document.querySelectorAll('.family-node');
+
+        familyNodes.forEach(node => {
+          node.addEventListener('click', (e) => {
+            const isActive = node.classList.contains('is-active');
+            familyNodes.forEach(n => n.classList.remove('is-active'));
+
+            if (!isActive) {
+              node.classList.add('is-active');
+              setTimeout(() => {
+                node.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'center',
+                  inline: 'center'
+                });
+              }, 200);
+            }
+            e.stopPropagation();
+          });
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.family-node')) {
+            familyNodes.forEach(node => node.classList.remove('is-active'));
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
